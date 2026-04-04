@@ -19,9 +19,9 @@
   --purple: #9d5cff;
   --purple-dim: #7b3fd4;
   --purple-glow: rgba(157, 92, 255, 0.15);
-  --gradient-main: linear-gradient(135deg, #00e5c8 0%, #6c3fff 50%, #c150ff 100%);
+  --gradient-main: linear-gradient(135deg, #00e5c8 100%);
   --gradient-subtle: linear-gradient(135deg, rgba(0,229,200,0.08) 0%, rgba(157,92,255,0.08) 100%);
-  --gradient-text: linear-gradient(135deg, #00e5c8 0%, #9d5cff 60%, #c150ff 100%);
+  --gradient-text: linear-gradient(135deg, #00e5c8 100%);
 
   /* Text */
   --text-primary: #eaecf5;
