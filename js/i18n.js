@@ -66,6 +66,24 @@ const i18n = {
 
     'footer.top':        'Back to top ↑',
     'legal.back':        '← Back to Homepage',
+
+    'imp.subtitle':           'Information according to § 5 TMG (German Telemedia Act)',
+    'imp.h_responsible':      'Responsible Party',
+    'imp.address':            '<strong>Glace Administration</strong><br>Gerrit Schneider<br>Furschweilerstraße 18<br>66640 Namborn<br>Germany',
+    'imp.h_contact':          'Contact',
+    'imp.contact_text':       'E-Mail: <a href="mailto:hello@glace-admin.com">hello@glace-admin.com</a><br>Discord: Glace Administration',
+    'imp.h_liability_content':'Liability for Content',
+    'imp.liability_content1': 'As a service provider, I am responsible for my own content on these pages in accordance with general legislation pursuant to § 7 para. 1 TMG. According to §§ 8 to 10 TMG, however, I am not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.',
+    'imp.liability_content2': 'Obligations to remove or block the use of information under general law remain unaffected by this. However, liability in this regard is only possible from the time of knowledge of a specific infringement. Upon becoming aware of corresponding infringements, I will remove such content immediately.',
+    'imp.h_liability_links':  'Liability for Links',
+    'imp.liability_links1':   'This website contains links to external third-party websites, over whose content I have no influence. Therefore, I cannot accept any liability for these external contents. The respective provider or operator of the linked pages is always responsible for their content.',
+    'imp.liability_links2':   'The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognizable at the time of linking. However, permanent monitoring of the content of linked pages is not reasonable without concrete indications of an infringement.',
+    'imp.h_copyright':        'Copyright',
+    'imp.copyright':          'The content and works on these pages created by the site operator are subject to German copyright law. Reproduction, editing, distribution, and any kind of use outside the limits of copyright law require the written consent of the respective author or creator.',
+    'imp.h_privacy':          'Privacy Notice',
+    'imp.privacy1':           'This website is hosted via GitHub Pages. When visiting this website, the hosting provider (GitHub/Microsoft) may collect server log files that may contain your browser type, operating system version, referrer URL, IP address, and the time of page access.',
+    'imp.privacy2':           'For more information on GitHub\'s privacy practices, please refer to: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a>.',
+    'imp.privacy3':           'This website does not use its own cookies, tracking tools, or analytics services. No personal data is collected or processed by the operator of this site, except in the case of direct contact via email.',
   },
 
   de: {
@@ -135,6 +153,24 @@ const i18n = {
 
     'footer.top':        'Nach oben ↑',
     'legal.back':        '← Zurück zur Startseite',
+
+    'imp.subtitle':           'Angaben gemäß § 5 TMG',
+    'imp.h_responsible':      'Verantwortlich',
+    'imp.address':            '<strong>Glace Administration</strong><br>Gerrit Schneider<br>Furschweilerstraße 18<br>66640 Namborn<br>Deutschland',
+    'imp.h_contact':          'Kontakt',
+    'imp.contact_text':       'E-Mail: <a href="mailto:hello@glace-admin.com">hello@glace-admin.com</a><br>Discord: Glace Administration',
+    'imp.h_liability_content':'Haftung für Inhalte',
+    'imp.liability_content1': 'Als Diensteanbieter bin ich gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.',
+    'imp.liability_content2': 'Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werde ich diese Inhalte umgehend entfernen.',
+    'imp.h_liability_links':  'Haftung für Links',
+    'imp.liability_links1':   'Diese Website enthält Links zu externen Websites Dritter, auf deren Inhalte ich keinen Einfluss habe. Deshalb kann ich für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.',
+    'imp.liability_links2':   'Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar.',
+    'imp.h_copyright':        'Urheberrecht',
+    'imp.copyright':          'Die durch den Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.',
+    'imp.h_privacy':          'Datenschutz',
+    'imp.privacy1':           'Diese Website wird über GitHub Pages gehostet. Beim Besuch dieser Website können durch den Hosting-Anbieter (GitHub/Microsoft) Server-Logfiles erhoben werden, die Ihren Browser-Typ, Ihre Betriebssystemversion, die Referrer-URL, Ihre IP-Adresse sowie den Zeitpunkt des Seitenzugriffs enthalten können.',
+    'imp.privacy2':           'Weitere Informationen zum Datenschutz bei GitHub finden Sie unter: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a>.',
+    'imp.privacy3':           'Diese Website verwendet keine eigenen Cookies, Tracking-Tools oder Analysedienste. Es werden keine personenbezogenen Daten durch den Betreiber dieser Seite erhoben oder verarbeitet, außer bei direkter Kontaktaufnahme per E-Mail.',
   }
 };
 
