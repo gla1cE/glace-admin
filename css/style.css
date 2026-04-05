@@ -2,7 +2,7 @@
    GLACE ADMINISTRATION — Design System
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap');
 
 :root {
   /* Core palette */
@@ -33,7 +33,7 @@
   --border-accent: rgba(0,229,200,0.2);
 
   /* Typography */
-  --font-display: 'Syne', sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Outfit', sans-serif;
 
   /* Spacing */
@@ -127,6 +127,7 @@ img {
    ============================================ */
 
 .navbar {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   position: fixed;
   top: 0;
   left: 0;
@@ -150,32 +151,34 @@ img {
 
 .nav-logo {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  font-family: var(--font-display);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 4px 0;
+  border-left: 2px solid var(--turquoise);
+  padding-left: 10px;
+}
+
+.logo-name {
+  font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: -0.02em;
-}
-
-.nav-logo .logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--gradient-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  color: var(--bg-deep);
-  font-weight: 900;
-}
-
-.nav-logo span {
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  line-height: 1;
   background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.logo-sub {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1;
 }
 
 .nav-links {
@@ -231,6 +234,27 @@ img {
 
 .nav-cta:hover {
   opacity: 0.9;
+}
+
+/* Language toggle */
+.lang-toggle {
+  padding: 5px 12px;
+  border-radius: 12px;
+  border: 3px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+  flex-shrink: 0;
+}
+
+.lang-toggle:hover {
+  border-color: var(--turquoise);
+  color: var(--turquoise);
 }
 
 /* Mobile menu */
@@ -299,6 +323,10 @@ section {
   align-items: center;
 }
 
+.hero-content {
+  text-align: center;
+}
+
 .hero-badge {
   display: inline-flex;
   align-items: center;
@@ -348,6 +376,8 @@ section {
   font-size: 1.1rem;
   color: var(--text-secondary);
   max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 2.5rem;
   animation: fadeInUp 0.8s 0.3s ease-out both;
 }
@@ -356,6 +386,7 @@ section {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
   animation: fadeInUp 0.8s 0.45s ease-out both;
 }
 
@@ -780,6 +811,18 @@ section {
   background: linear-gradient(180deg, transparent 50%, var(--bg-deep) 100%);
 }
 
+.about-alias {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.3rem;
+}
+
 .about-text h3 {
   font-family: var(--font-display);
   font-size: 1.6rem;
@@ -917,6 +960,36 @@ section {
   opacity: 0.7;
 }
 
+.footer-social {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.social-link {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s, background 0.3s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.social-link:hover {
+  border-color: var(--turquoise);
+  background: var(--turquoise-glow);
+  transform: translateY(-2px);
+}
+
+.social-link img {
+  width: 15px;
+  height: 15px;
+}
+
 .footer-right {
   display: flex;
   gap: 1.5rem;
@@ -1013,6 +1086,47 @@ section {
 }
 
 /* ============================================
+   Placeholder image sizing
+   ============================================ */
+
+.emblem-icon img {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.orbit-node img {
+  width: 20px;
+  height: 20px;
+}
+
+.service-icon img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ref-avatar img {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.about-image {
+  font-size: 0; /* remove leftover emoji sizing */
+}
+
+.about-image img {
+  width: 60%;
+  height: auto;
+  max-height: 70%;
+  object-fit: contain;
+}
+
+.link-icon img {
+  width: 1.1rem;
+  height: 1.1rem;
+  vertical-align: middle;
+}
+
+/* ============================================
    Animations
    ============================================ */
 
@@ -1042,6 +1156,7 @@ section {
    Responsive
    ============================================ */
 
+/* ── Tablet ─────────────────────────────── */
 @media (max-width: 992px) {
   .hero .container {
     grid-template-columns: 1fr;
@@ -1083,6 +1198,7 @@ section {
   }
 }
 
+/* ── Mobile ──────────────────────────────── */
 @media (max-width: 768px) {
   .nav-links {
     display: none;
@@ -1106,13 +1222,151 @@ section {
     display: flex;
   }
 
+  .hero {
+    padding-top: calc(72px + 3rem);
+  }
+
   .services-grid {
     grid-template-columns: 1fr;
+  }
+
+  .contact-box {
+    padding: 2rem 1.5rem;
+  }
+
+  .section-header {
+    margin-bottom: 2.5rem;
   }
 
   .footer {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+  }
+}
+
+/* ── Small phones ────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --section-padding: 3rem 1.25rem;
+  }
+
+  .navbar {
+    padding: 0 1.25rem;
+  }
+
+  .hero {
+    padding-top: calc(72px + 2rem);
+  }
+
+  .hero h1 {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 13px 20px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .stats-bar {
+    padding: 2rem 1.25rem;
+  }
+
+  .stats-bar .container {
+    gap: 1rem;
+  }
+
+  .stat-item .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+
+  .service-card {
+    padding: 1.5rem;
+  }
+
+  .ref-card {
+    padding: 1.5rem;
+  }
+
+  .contact-box {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .contact-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .about-image {
+    max-width: 200px;
+  }
+
+  .about-skills {
+    gap: 6px;
+  }
+
+  .skill-pill {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+
+  .footer {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .footer-right {
+    gap: 1rem;
+  }
+
+  .legal-page {
+    padding-top: calc(72px + 1.5rem);
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .legal-content h1 {
+    font-size: 1.8rem;
+  }
+}
+
+/* ── Very small phones (≤ 380px) ────────── */
+@media (max-width: 380px) {
+  .nav-logo span {
+    display: none;
+  }
+
+  .stats-bar .container {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .stat-item {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1rem;
+  }
+
+  .stat-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
   }
 }

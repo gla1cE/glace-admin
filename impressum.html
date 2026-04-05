@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex">
   <title>Impressum — Glace Administration</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 
@@ -16,16 +16,17 @@
   <!-- Navigation -->
   <nav class="navbar scrolled" id="navbar">
     <a href="index.html" class="nav-logo">
-      <div class="logo-icon">GA</div>
-      <span>Glace Admin</span>
+      <span class="logo-name">Glace</span>
+      <span class="logo-sub">Administration</span>
     </a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="index.html#services">Leistungen</a></li>
-      <li><a href="index.html#references">Referenzen</a></li>
-      <li><a href="index.html#about">Über mich</a></li>
-      <li><a href="index.html#contact" class="nav-cta">Kontakt</a></li>
+      <li><a href="index.html#services" data-i18n="nav.services">Services</a></li>
+      <li><a href="index.html#references" data-i18n="nav.references">References</a></li>
+      <li><a href="index.html#about" data-i18n="nav.about">About</a></li>
+      <li><a href="index.html#contact" class="nav-cta" data-i18n="nav.contact">Contact</a></li>
     </ul>
-    <button class="nav-toggle" id="navToggle" aria-label="Menü öffnen">
+    <button class="lang-toggle" id="langToggle" aria-label="Switch language">DE</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -34,7 +35,7 @@
   <main class="legal-page">
     <div class="legal-content">
 
-      <a href="index.html" class="legal-back">← Zurück zur Startseite</a>
+      <a href="index.html" class="legal-back" data-i18n="legal.back">← Back to Homepage</a>
 
       <h1>Impressum</h1>
       <p class="legal-subtitle">Angaben gemäß § 5 TMG</p>
@@ -129,13 +130,32 @@
     <div class="footer-left">
       © 2026 Glace Administration · <a href="impressum.html">Impressum</a>
     </div>
+    <div class="footer-social">
+      <a href="https://discord.gg/" class="social-link" aria-label="Discord" target="_blank" rel="noopener">
+        <img src="img/social/discord.svg" alt="Discord">
+      </a>
+      <a href="#" class="social-link" aria-label="Twitter / X" target="_blank" rel="noopener">
+        <img src="img/social/twitter.svg" alt="Twitter / X">
+      </a>
+      <a href="#" class="social-link" aria-label="Instagram" target="_blank" rel="noopener">
+        <img src="img/social/instagram.svg" alt="Instagram">
+      </a>
+    </div>
     <div class="footer-right">
-      <a href="index.html">Startseite</a>
+      <a href="index.html" data-i18n="legal.back">← Back to Homepage</a>
       <a href="#">Nach oben ↑</a>
     </div>
   </footer>
 
+  <script src="js/i18n.js"></script>
   <script>
+    // Apply saved language (default: English)
+    applyLang(localStorage.getItem('glace_lang') || 'en');
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      applyLang(localStorage.getItem('glace_lang') === 'de' ? 'en' : 'de');
+    });
+
     const navToggle = document.getElementById('navToggle');
     const navLinks = document.getElementById('navLinks');
     navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));

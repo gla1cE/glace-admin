@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Glace Administration — Professioneller Admin für E-Sports Turniere und CS2 Events. Turnierleitung, Regelwerke, Live-Support und mehr.">
-  <meta name="keywords" content="CS2, Counter-Strike 2, E-Sports, Turnier, Admin, Tournament Administration, Glace">
+  <meta name="description" content="Glace Administration — Professional Admin for E-Sports Tournaments. Tournament management, rulesets, live support and more.">
+  <meta name="keywords" content="E-Sports, Tournament, Admin, Tournament Administration, Glace, CS2, FPS, Online Events, LAN">
   <meta name="author" content="Glace Administration">
   <meta property="og:title" content="Glace Administration — E-Sports Tournament Admin">
-  <meta property="og:description" content="Professioneller Admin für E-Sports Turniere, spezialisiert auf CS2.">
+  <meta property="og:description" content="Professional admin for competitive e-sports tournaments of all kinds.">
   <meta property="og:type" content="website">
   <title>Glace Administration — E-Sports Tournament Admin</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 
@@ -21,16 +21,17 @@
   <!-- Navigation -->
   <nav class="navbar" id="navbar">
     <a href="#" class="nav-logo">
-      <div class="logo-icon">GA</div>
-      <span>Glace Admin</span>
+      <span class="logo-name">Glace</span>
+      <span class="logo-sub">Administration</span>
     </a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#services" class="active">Leistungen</a></li>
-      <li><a href="#references">Referenzen</a></li>
-      <li><a href="#about">Über mich</a></li>
-      <li><a href="#contact" class="nav-cta">Kontakt</a></li>
+      <li><a href="#services" class="active" data-i18n="nav.services">Services</a></li>
+      <li><a href="#references" data-i18n="nav.references">References</a></li>
+      <li><a href="#about" data-i18n="nav.about">About</a></li>
+      <li><a href="#contact" class="nav-cta" data-i18n="nav.contact">Contact</a></li>
     </ul>
-    <button class="nav-toggle" id="navToggle" aria-label="Menü öffnen">
+    <button class="lang-toggle" id="langToggle" aria-label="Switch language">DE</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -42,26 +43,22 @@
       <div class="hero-content">
         <div class="hero-badge">
           <span class="dot"></span>
-          Verfügbar für Turniere
+          <span data-i18n="hero.badge">Available for Tournaments</span>
         </div>
-        <h1>
-          Professionelle<br>
-          <span class="highlight">Turnierleitung</span><br>
-          für CS2 E-Sports
+        <h1 data-i18n-html="hero.title">
+          Professional<br>
+          <span class="highlight">Tournament Admin</span><br>
+          for E-Sports
         </h1>
-        <p class="hero-description">
-          Ich sorge dafür, dass dein Turnier reibungslos läuft — von der Planung über
-          das Regelwerk bis hin zum Live-Support. Fokussiert auf Counter-Strike 2 und
-          die kompetitive E-Sports Szene.
+        <p class="hero-description" data-i18n="hero.description">
+          I make sure your tournament runs smoothly — from planning and ruleset to live support. Bringing structure and professionalism to competitive e-sports events of all kinds.
         </p>
         <div class="hero-actions">
           <a href="#contact" class="btn-primary">
-            Jetzt anfragen
+            <span data-i18n="hero.btn_primary">Get in touch</span>
             <span>→</span>
           </a>
-          <a href="#references" class="btn-secondary">
-            Referenzen ansehen
-          </a>
+          <a href="#references" class="btn-secondary" data-i18n="hero.btn_secondary">View References</a>
         </div>
       </div>
 
@@ -71,16 +68,16 @@
           <div class="emblem-ring emblem-ring-inner"></div>
           <div class="emblem-ring emblem-ring-core"></div>
           <div class="emblem-center">
-            <span class="emblem-icon">🎯</span>
+            <span class="emblem-icon"><img src="img/hero/emblem-target.svg" alt=""></span>
             <span class="emblem-title">GLACE</span>
             <span class="emblem-sub">Administration</span>
           </div>
-          <div class="orbit-node">🏆</div>
-          <div class="orbit-node">⚙️</div>
-          <div class="orbit-node">📋</div>
-          <div class="orbit-node">🎮</div>
-          <div class="orbit-node">📡</div>
-          <div class="orbit-node">🛡️</div>
+          <div class="orbit-node"><img src="img/hero/orbit-trophy.svg" alt=""></div>
+          <div class="orbit-node"><img src="img/hero/orbit-gear.svg" alt=""></div>
+          <div class="orbit-node"><img src="img/hero/orbit-clipboard.svg" alt=""></div>
+          <div class="orbit-node"><img src="img/hero/orbit-gamepad.svg" alt=""></div>
+          <div class="orbit-node"><img src="img/hero/orbit-satellite.svg" alt=""></div>
+          <div class="orbit-node"><img src="img/hero/orbit-shield.svg" alt=""></div>
         </div>
       </div>
     </div>
@@ -91,19 +88,19 @@
     <div class="container">
       <div class="stat-item">
         <div class="stat-value">50+</div>
-        <div class="stat-label">Betreute Turniere</div>
+        <div class="stat-label" data-i18n="stats.tournaments">Tournaments Managed</div>
       </div>
       <div class="stat-item">
         <div class="stat-value">CS2</div>
-        <div class="stat-label">Spezialisierung</div>
+        <div class="stat-label" data-i18n="stats.specialization">Specialization</div>
       </div>
       <div class="stat-item">
         <div class="stat-value">24/7</div>
-        <div class="stat-label">Event-Support</div>
+        <div class="stat-label" data-i18n="stats.support">Event Support</div>
       </div>
       <div class="stat-item">
         <div class="stat-value">DE/EN</div>
-        <div class="stat-label">Sprachen</div>
+        <div class="stat-label" data-i18n="stats.languages">Languages</div>
       </div>
     </div>
   </section>
@@ -112,46 +109,46 @@
   <section class="services" id="services">
     <div class="container">
       <div class="section-header fade-in">
-        <span class="section-tag">Leistungen</span>
-        <h2>Was ich für dein Turnier leiste</h2>
-        <p>Alles aus einer Hand — damit du dich auf das Wesentliche konzentrieren kannst.</p>
+        <span class="section-tag" data-i18n="services.tag">Services</span>
+        <h2 data-i18n="services.title">What I do for your tournament</h2>
+        <p data-i18n="services.subtitle">Everything from one source — so you can focus on what matters.</p>
       </div>
       <div class="services-grid">
 
         <div class="service-card fade-in">
-          <div class="service-icon turquoise">⚙️</div>
-          <h3>Turnier-Administration</h3>
-          <p>Komplette Verwaltung deines Turniers — von Bracket-Management über Zeitpläne bis hin zur Ergebnispflege in Echtzeit.</p>
+          <div class="service-icon turquoise"><img src="img/services/tournament-admin.svg" alt=""></div>
+          <h3 data-i18n="service1.title">Tournament Administration</h3>
+          <p data-i18n="service1.desc">Complete management of your tournament — from bracket management and schedules to real-time result tracking.</p>
         </div>
 
         <div class="service-card fade-in">
-          <div class="service-icon purple">📋</div>
-          <h3>Regelwerk & Richtlinien</h3>
-          <p>Erstellung und Durchsetzung professioneller Regelwerke, angepasst an CS2-spezifische Anforderungen und Formatvorgaben.</p>
+          <div class="service-icon purple"><img src="img/services/ruleset.svg" alt=""></div>
+          <h3 data-i18n="service2.title">Ruleset & Guidelines</h3>
+          <p data-i18n="service2.desc">Creation and enforcement of professional rulesets, tailored to each game's specific requirements and format specifications.</p>
         </div>
 
         <div class="service-card fade-in">
-          <div class="service-icon turquoise">📡</div>
-          <h3>Live-Support</h3>
-          <p>Direkter Ansprechpartner während des Events für Spieler, Teams und Organisatoren. Schnelle Entscheidungen bei Disputes und Protests.</p>
+          <div class="service-icon turquoise"><img src="img/services/live-support.svg" alt=""></div>
+          <h3 data-i18n="service3.title">Live Support</h3>
+          <p data-i18n="service3.desc">Direct contact during the event for players, teams, and organizers. Quick decisions on disputes and protests.</p>
         </div>
 
         <div class="service-card fade-in">
-          <div class="service-icon purple">🖥️</div>
-          <h3>Server-Setup</h3>
-          <p>Konfiguration von CS2-Servern mit korrekten Turnier-Settings, Anti-Cheat Integration und technischem Setup für Online- und LAN-Events.</p>
+          <div class="service-icon purple"><img src="img/services/server-setup.svg" alt=""></div>
+          <h3 data-i18n="service4.title">Server Setup</h3>
+          <p data-i18n="service4.desc">Configuration of game servers with correct tournament settings, anti-cheat integration, and technical setup for online and LAN events.</p>
         </div>
 
         <div class="service-card fade-in">
-          <div class="service-icon turquoise">🏆</div>
-          <h3>Event-Planung</h3>
-          <p>Beratung bei der Planung von Turnierformaten, Preisgeldern, Zeitplänen und Kommunikationsstrategien für erfolgreiche Events.</p>
+          <div class="service-icon turquoise"><img src="img/services/event-planning.svg" alt=""></div>
+          <h3 data-i18n="service5.title">Event Planning</h3>
+          <p data-i18n="service5.desc">Consulting on tournament formats, prize pools, schedules, and communication strategies for successful events.</p>
         </div>
 
         <div class="service-card fade-in">
-          <div class="service-icon purple">🛡️</div>
-          <h3>Anti-Cheat & Fair Play</h3>
-          <p>Überwachung der Integrität des Wettbewerbs durch Demo-Reviews, Überprüfung verdächtiger Situationen und Einhaltung des Regelwerks.</p>
+          <div class="service-icon purple"><img src="img/services/anticheat.svg" alt=""></div>
+          <h3 data-i18n="service6.title">Anti-Cheat & Fair Play</h3>
+          <p data-i18n="service6.desc">Monitoring competition integrity through demo reviews, verification of suspicious situations, and ruleset enforcement.</p>
         </div>
 
       </div>
@@ -162,79 +159,75 @@
   <section class="references" id="references">
     <div class="container">
       <div class="section-header fade-in">
-        <span class="section-tag">Referenzen</span>
-        <h2>Erfahrung & bisherige Arbeit</h2>
-        <p>Ausgewählte Projekte und Zusammenarbeiten aus der E-Sports Szene.</p>
+        <span class="section-tag" data-i18n="refs.tag">References</span>
+        <h2 data-i18n="refs.title">Experience & Past Work</h2>
+        <p data-i18n="refs.subtitle">Selected projects and collaborations from the e-sports scene.</p>
       </div>
       <div class="ref-grid">
 
         <div class="ref-card fade-in">
           <div class="ref-card-header">
-            <div class="ref-avatar">🏟️</div>
+            <div class="ref-avatar"><img src="img/references/arena.svg" alt=""></div>
             <div class="ref-meta">
               <h4>Community Tournament Series</h4>
-              <span>Online · 2024–2025</span>
+              <span data-i18n="ref1.period">Online · 2024–2025</span>
             </div>
           </div>
-          <div class="ref-card-body">
-            Administration und Durchführung einer regelmäßigen Turnierserie mit über 32 Teams pro Saison.
-            Verantwortlich für Bracket-Management, Regelwerk und Dispute-Resolution.
+          <div class="ref-card-body" data-i18n="ref1.desc">
+            Administration and execution of a regular tournament series with over 32 teams per season. Responsible for bracket management, ruleset, and dispute resolution.
           </div>
           <div class="ref-tags">
             <span class="ref-tag">CS2</span>
-            <span class="ref-tag purple">Turnierleitung</span>
+            <span class="ref-tag purple" data-i18n="ref1.tag">Tournament Management</span>
             <span class="ref-tag">Online</span>
           </div>
         </div>
 
         <div class="ref-card fade-in">
           <div class="ref-card-header">
-            <div class="ref-avatar">🎯</div>
+            <div class="ref-avatar"><img src="img/references/target.svg" alt=""></div>
             <div class="ref-meta">
               <h4>LAN Event Administration</h4>
-              <span>LAN · 2024</span>
+              <span data-i18n="ref2.period">LAN · 2024</span>
             </div>
           </div>
-          <div class="ref-card-body">
-            Vor-Ort-Administration bei LAN-Events inklusive Server-Setup,
-            technischer Betreuung und Live-Entscheidungen bei Regelauslegungen.
+          <div class="ref-card-body" data-i18n="ref2.desc">
+            On-site administration at LAN events including server setup, technical support, and live decisions on rule interpretations.
           </div>
           <div class="ref-tags">
             <span class="ref-tag">CS2</span>
             <span class="ref-tag purple">LAN</span>
-            <span class="ref-tag">Server-Setup</span>
+            <span class="ref-tag" data-i18n="ref2.tag">Server Setup</span>
           </div>
         </div>
 
         <div class="ref-card fade-in">
           <div class="ref-card-header">
-            <div class="ref-avatar">📋</div>
+            <div class="ref-avatar"><img src="img/references/clipboard.svg" alt=""></div>
             <div class="ref-meta">
-              <h4>Regelwerk-Entwicklung</h4>
-              <span>Beratung · fortlaufend</span>
+              <h4 data-i18n="ref3.title">Ruleset Development</h4>
+              <span data-i18n="ref3.period">Consulting · ongoing</span>
             </div>
           </div>
-          <div class="ref-card-body">
-            Erstellung und Überarbeitung umfangreicher CS2-Regelwerke für verschiedene
-            Turnierveranstalter. Orientierung an professionellen Standards der Szene.
+          <div class="ref-card-body" data-i18n="ref3.desc">
+            Creation and revision of comprehensive CS2 rulesets for various tournament organizers. Aligned with professional standards of the scene.
           </div>
           <div class="ref-tags">
-            <span class="ref-tag purple">Regelwerk</span>
-            <span class="ref-tag">Beratung</span>
+            <span class="ref-tag purple" data-i18n="ref3.tag1">Ruleset</span>
+            <span class="ref-tag" data-i18n="ref3.tag2">Consulting</span>
           </div>
         </div>
 
         <div class="ref-card fade-in">
           <div class="ref-card-header">
-            <div class="ref-avatar">📡</div>
+            <div class="ref-avatar"><img src="img/references/satellite.svg" alt=""></div>
             <div class="ref-meta">
               <h4>Anti-Cheat & Integrity</h4>
-              <span>Support · fortlaufend</span>
+              <span data-i18n="ref4.period">Support · ongoing</span>
             </div>
           </div>
-          <div class="ref-card-body">
-            Demo-Reviews und Integritätsprüfungen für Online-Ligen.
-            Analyse verdächtiger Spielsituationen und Unterstützung bei der Durchsetzung von Fair Play.
+          <div class="ref-card-body" data-i18n="ref4.desc">
+            Demo reviews and integrity checks for online leagues. Analysis of suspicious gameplay situations and support in enforcing fair play.
           </div>
           <div class="ref-tags">
             <span class="ref-tag">Anti-Cheat</span>
@@ -251,33 +244,31 @@
   <section class="about" id="about">
     <div class="container">
       <div class="section-header fade-in">
-        <span class="section-tag">Über mich</span>
-        <h2>Die Person hinter Glace</h2>
+        <span class="section-tag" data-i18n="about.tag">About Me</span>
+        <h2 data-i18n="about.title">The Person Behind Glace</h2>
       </div>
       <div class="about-content fade-in">
-        <div class="about-image">🧑‍💻</div>
+        <div class="about-image">
+          <img src="img/about/developer.svg" alt="">
+        </div>
         <div class="about-text">
-          <h3>E-Sports Admin aus Leidenschaft</h3>
-          <p>
-            Mein Ziel ist es, E-Sports Turniere auf das nächste Level zu heben. Mit
-            umfassender Erfahrung in der kompetitiven CS2-Szene kenne ich die
-            Herausforderungen, die bei der Organisation von Turnieren auftreten — und
-            weiß, wie man sie löst.
+          <div class="about-alias">gla1cE</div>
+          <h3 data-i18n="about.subtitle">E-Sports Admin by Passion</h3>
+          <p data-i18n="about.p1">
+            My goal is to take e-sports tournaments to the next level. With extensive experience in the competitive scene, I know the challenges that arise when organizing events — and how to solve them.
           </p>
-          <p>
-            Von kleinen Community-Cups bis hin zu größeren Online-Ligen: Ich bringe
-            Struktur, Fairness und professionelle Abwicklung in jedes Event.
-            Verlässlichkeit und schnelle Kommunikation sind dabei meine Grundpfeiler.
+          <p data-i18n="about.p2">
+            From small community cups to larger online leagues: I bring structure, fairness, and professional execution to every event. Reliability and fast communication are my cornerstones.
           </p>
           <div class="about-skills">
             <span class="skill-pill">CS2</span>
-            <span class="skill-pill">Turnierleitung</span>
-            <span class="skill-pill">Regelwerke</span>
-            <span class="skill-pill">Server-Konfiguration</span>
+            <span class="skill-pill" data-i18n="skill.tournament">Tournament Management</span>
+            <span class="skill-pill" data-i18n="skill.ruleset">Rulesets</span>
+            <span class="skill-pill" data-i18n="skill.server">Server Configuration</span>
             <span class="skill-pill">FACEIT</span>
             <span class="skill-pill">ESEA</span>
             <span class="skill-pill">Discord</span>
-            <span class="skill-pill">Bracket-Mgmt</span>
+            <span class="skill-pill" data-i18n="skill.bracket">Bracket Mgmt</span>
             <span class="skill-pill">Demo-Review</span>
           </div>
         </div>
@@ -289,19 +280,19 @@
   <section class="contact" id="contact">
     <div class="container">
       <div class="section-header fade-in">
-        <span class="section-tag">Kontakt</span>
-        <h2>Lass uns zusammenarbeiten</h2>
+        <span class="section-tag" data-i18n="contact.tag">Contact</span>
+        <h2 data-i18n="contact.title">Let's work together</h2>
       </div>
       <div class="contact-box fade-in">
-        <h3>Turnier geplant?</h3>
-        <p>Schreib mir und wir besprechen, wie ich dein Event unterstützen kann.</p>
+        <h3 data-i18n="contact.subtitle">Tournament planned?</h3>
+        <p data-i18n="contact.desc">Write to me and we'll discuss how I can support your event.</p>
         <div class="contact-methods">
           <a href="mailto:kontakt@glace-admin.de" class="contact-link">
-            <span class="link-icon">✉️</span>
+            <span class="link-icon"><img src="img/contact/envelope.svg" alt="Email"></span>
             kontakt@glace-admin.de
           </a>
           <a href="https://discord.gg/" target="_blank" rel="noopener" class="contact-link">
-            <span class="link-icon">💬</span>
+            <span class="link-icon"><img src="img/social/discord.svg" alt="Discord"></span>
             Discord: Glace Administration
           </a>
         </div>
@@ -314,14 +305,31 @@
     <div class="footer-left">
       © 2026 Glace Administration · <a href="impressum.html">Impressum</a>
     </div>
+    <div class="footer-social">
+      <a href="https://discord.gg/" class="social-link" aria-label="Discord" target="_blank" rel="noopener">
+        <img src="img/social/discord.svg" alt="Discord">
+      </a>
+      <a href="#" class="social-link" aria-label="Twitter / X" target="_blank" rel="noopener">
+        <img src="img/social/twitter.svg" alt="Twitter / X">
+      </a>
+      <a href="#" class="social-link" aria-label="Instagram" target="_blank" rel="noopener">
+        <img src="img/social/instagram.svg" alt="Instagram">
+      </a>
+    </div>
     <div class="footer-right">
-      <a href="impressum.html">Impressum</a>
-      <a href="#hero">Nach oben ↑</a>
+      <a href="#hero" data-i18n="footer.top">Back to top ↑</a>
     </div>
   </footer>
 
-  <!-- Script -->
+  <script src="js/i18n.js"></script>
   <script>
+    // Apply saved language (default: English)
+    applyLang(localStorage.getItem('glace_lang') || 'en');
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      applyLang(localStorage.getItem('glace_lang') === 'de' ? 'en' : 'de');
+    });
+
     // Mobile nav toggle
     const navToggle = document.getElementById('navToggle');
     const navLinks = document.getElementById('navLinks');
@@ -330,7 +338,6 @@
       navLinks.classList.toggle('open');
     });
 
-    // Close nav on link click
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => navLinks.classList.remove('open'));
     });
