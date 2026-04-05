@@ -57,7 +57,8 @@ const i18n = {
     'skill.tournament':  'Tournament Management',
     'skill.ruleset':     'Rulesets',
     'skill.server':      'Server Configuration',
-    'skill.bracket':     'Bracket Mgmt',
+    'skill.player':      'Player Management',
+    'skill.stage':     'Stage Administration',
 
     'contact.tag':       'Contact',
     'contact.title':     "Let's work together",
@@ -71,7 +72,7 @@ const i18n = {
     'imp.h_responsible':      'Responsible Party',
     'imp.address':            '<strong>Glace Administration</strong><br>Gerrit Schneider<br>Furschweilerstraße 18<br>66640 Namborn<br>Germany',
     'imp.h_contact':          'Contact',
-    'imp.contact_text':       'E-Mail: <a href="mailto:hello@glace-admin.com">hello@glace-admin.com</a><br>Discord: Glace Administration',
+    'imp.contact_text':       'E-Mail: <a href="mailto:hello@glace-admin.com">hello@glace-admin.com</a><br>Discord: gla1ce',
     'imp.h_liability_content':'Liability for Content',
     'imp.liability_content1': 'As a service provider, I am responsible for my own content on these pages in accordance with general legislation pursuant to § 7 para. 1 TMG. According to §§ 8 to 10 TMG, however, I am not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.',
     'imp.liability_content2': 'Obligations to remove or block the use of information under general law remain unaffected by this. However, liability in this regard is only possible from the time of knowledge of a specific infringement. Upon becoming aware of corresponding infringements, I will remove such content immediately.',
@@ -94,7 +95,7 @@ const i18n = {
 
     'hero.badge':        'Verfügbar für Turniere',
     'hero.title':        'Professionelle<br><span class="highlight">Turnierleitung</span><br>für E-Sports',
-    'hero.description':  'Ich sorge dafür, dass dein Turnier reibungslos läuft — von der Planung über das Regelwerk bis hin zum Live-Support. Struktur und Professionalität für kompetitive E-Sports Events aller Art.',
+    'hero.description':  'Ich sorge dafür, dass dein Turnier reibungslos läuft — von der Planung über das Regelwerk bis hin zum Live-Support. Struktur und Professionalität für kompetitive E-Sport Events aller Art.',
     'hero.btn_primary':  'Jetzt anfragen',
     'hero.btn_secondary':'Referenzen ansehen',
 
@@ -144,7 +145,7 @@ const i18n = {
     'skill.tournament':  'Turnierleitung',
     'skill.ruleset':     'Regelwerke',
     'skill.server':      'Server-Konfiguration',
-    'skill.bracket':     'Bracket-Mgmt',
+    'skill.player':      'Spieler-Management',
 
     'contact.tag':       'Kontakt',
     'contact.title':     'Lass uns zusammenarbeiten',
