@@ -796,10 +796,7 @@ section {
   border-radius: var(--radius-lg);
   background: var(--gradient-subtle);
   border: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
+  display: block;
   position: relative;
   overflow: hidden;
 }
