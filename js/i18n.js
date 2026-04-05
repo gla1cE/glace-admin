@@ -50,7 +50,7 @@ const i18n = {
     'ref4.desc':         'Demo reviews and integrity checks for online leagues. Analysis of suspicious gameplay situations and support in enforcing fair play.',
 
     'about.tag':         'About Me',
-    'about.title':       'The Person Behind Glace',
+    'about.title':       'The Person Behind Glace Administration',
     'about.subtitle':    'E-Sports Admin by Passion',
     'about.p1':          'My goal is to take e-sports tournaments to the next level. With extensive experience in the competitive scene, I know the challenges that arise when organizing events — and how to solve them.',
     'about.p2':          'From small community cups to larger online leagues: I bring structure, fairness, and professional execution to every event. Reliability and fast communication are my cornerstones.',
@@ -119,7 +119,7 @@ const i18n = {
     'ref4.desc':         'Demo-Reviews und Integritätsprüfungen für Online-Ligen. Analyse verdächtiger Spielsituationen und Unterstützung bei der Durchsetzung von Fair Play.',
 
     'about.tag':         'Über mich',
-    'about.title':       'Die Person hinter Glace',
+    'about.title':       'Die Person hinter Glace Administration',
     'about.subtitle':    'E-Sports Admin aus Leidenschaft',
     'about.p1':          'Mein Ziel ist es, E-Sports Turniere auf das nächste Level zu heben. Mit umfassender Erfahrung in der kompetitiven Szene kenne ich die Herausforderungen, die bei der Organisation von Events auftreten — und weiß, wie man sie löst.',
     'about.p2':          'Von kleinen Community-Cups bis hin zu größeren Online-Ligen: Ich bringe Struktur, Fairness und professionelle Abwicklung in jedes Event. Verlässlichkeit und schnelle Kommunikation sind dabei meine Grundpfeiler.',
