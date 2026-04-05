@@ -62,7 +62,7 @@ const i18n = {
     'contact.tag':       'Contact',
     'contact.title':     "Let's work together",
     'contact.subtitle':  'Tournament planned?',
-    'contact.desc':      "Write to me and we'll discuss how I can support your event.",
+    'contact.desc':      "Message me and we'll discuss how I can support your event.",
 
     'footer.top':        'Back to top ↑',
     'legal.back':        '← Back to Homepage',
