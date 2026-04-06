@@ -56,6 +56,13 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
+  font-size: 125%;
+}
+
+@media (max-width: 992px) {
+  html {
+    font-size: 100%;
+  }
 }
 
 body {
@@ -533,7 +540,6 @@ section {
 .orbit-node:nth-child(8) { bottom: 5%; left: 50%; transform: translateX(-50%); animation-delay: 3s; }
 .orbit-node:nth-child(9) { bottom: 25%; left: -5%; animation-delay: 4s; }
 .orbit-node:nth-child(10) { top: 25%; left: -5%; animation-delay: 5s; }
-
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -967,8 +973,8 @@ section {
 }
 
 .social-link {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
@@ -986,8 +992,8 @@ section {
 }
 
 .social-link img {
-  width: 15px;
-  height: 15px;
+  width: 22px;
+  height: 22px;
 }
 
 .footer-right {
@@ -1090,13 +1096,15 @@ section {
    ============================================ */
 
 .emblem-icon img {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 8px;
 }
 
 .orbit-node img {
   width: 20px;
   height: 20px;
+  border-radius: 3px;
 }
 
 .service-icon img {
