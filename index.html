@@ -370,6 +370,19 @@
 
     faders.forEach(el => fadeObserver.observe(el));
 
+    // Show/hide mobile-only about image based on orbit visibility
+    const heroVisual = document.querySelector('.hero-visual');
+    const mobileAboutImg = document.querySelector('.about-image-mobile');
+
+    function syncMobileAboutImage() {
+      if (!heroVisual || !mobileAboutImg) return;
+      const orbitsVisible = getComputedStyle(heroVisual).display !== 'none';
+      mobileAboutImg.style.display = orbitsVisible ? 'none' : '';
+    }
+
+    syncMobileAboutImage();
+    window.addEventListener('resize', syncMobileAboutImage);
+
     // Active nav link on scroll
     const sections = document.querySelectorAll('section[id]');
     const navItems = document.querySelectorAll('.nav-links a:not(.nav-cta)');
