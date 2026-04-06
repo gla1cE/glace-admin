@@ -1143,6 +1143,12 @@ section {
   display: none;
 }
 
+@media (min-width: 993px) {
+  .about-image-mobile {
+    display: none !important;
+  }
+}
+
 .about-image img {
   position: absolute;
   inset: 0;
