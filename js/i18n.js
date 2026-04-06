@@ -42,6 +42,7 @@ const i18n = {
     'ref2.desc':         'Tournament admin for the biweekly Skinbaron Cups — a single-elimination bracket format. Responsible for full tournament administration and ensuring every team receives their prize money.',
     'ref3.period':       'LAN · 2026',
     'ref3.desc':         'Supported BIG as on-site admin during Gamescom LAN 2026 — covering a 2-day 5v5 tournament, a Wingman Cup, and a 1v1 Bonus Cup. Acted as tournament admin and on-site contact for all participants in the dedicated admin area.',
+    'ref4.title':        'Empress Program',
     'ref4.period':       'Online · ongoing',
     'ref4.desc':         'Running the Empress program at DACH CS — exclusively for female CS2 players. Organizing 2v2 Wingman tournaments ("Wingwomen Cups") and leading the planning of the first 5v5 cup.',
 
@@ -127,6 +128,7 @@ const i18n = {
     'ref2.desc':         'Turnier-Admin bei den zweiwöchentlichen Skinbaron Cups — Single-Elimination-Bracket-Format. Verantwortlich für die gesamte Turnierverwaltung sowie die korrekte Auszahlung der Preisgelder an alle Teams.',
     'ref3.period':       'LAN · 2026',
     'ref3.desc':         'Als Admin für BIG auf der Gamescom LAN 2026 vor Ort — 2-tägiges 5v5-Turnier sowie Wingman- und 1v1-Bonus-Cup. Turnier-Admin und direkter Ansprechpartner für alle Teilnehmer im dedizierten Admin-Bereich.',
+    'ref4.title':        'Empress Programm',
     'ref4.period':       'Online · fortlaufend',
     'ref4.desc':         'Leitung des Empress-Programms bei DACH CS — exklusiv für weibliche CS2-Spielerinnen. Organisation 2v2-Wingman-Turniere ("Wingwomen Cups") sowie Planung des ersten 5v5-Cups.',
 
