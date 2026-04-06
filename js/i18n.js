@@ -83,6 +83,8 @@ const i18n = {
     'imp.privacy1':           'This website is hosted via GitHub Pages. When visiting this website, the hosting provider (GitHub/Microsoft) may collect server log files that may contain your browser type, operating system version, referrer URL, IP address, and the time of page access.',
     'imp.privacy2':           'For more information on GitHub\'s privacy practices, please refer to: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a>.',
     'imp.privacy3':           'This website does not use its own cookies, tracking tools, or analytics services. No personal data is collected or processed by the operator of this site, except in the case of direct contact via email.',
+    'imp.h_logos':            'Image & Logo Credits',
+    'imp.logos':              'Some logos and images displayed on this website belong to their respective owners (e.g. DACH CS, Skinbaron, BIG, Empress, FACEIT, Valve/CS2). They are used solely for reference and portfolio purposes to identify organizations I have worked with. No affiliation, sponsorship, or endorsement by these organizations is implied. If you are a rights holder and object to the use of your logo or image, please contact me at <a href="mailto:hello@glace-admin.com">hello@glace-admin.com</a> and I will remove it immediately.',
   },
 
   de: {
@@ -169,6 +171,8 @@ const i18n = {
     'imp.privacy1':           'Diese Website wird über GitHub Pages gehostet. Beim Besuch dieser Website können durch den Hosting-Anbieter (GitHub/Microsoft) Server-Logfiles erhoben werden, die Ihren Browser-Typ, Ihre Betriebssystemversion, die Referrer-URL, Ihre IP-Adresse sowie den Zeitpunkt des Seitenzugriffs enthalten können.',
     'imp.privacy2':           'Weitere Informationen zum Datenschutz bei GitHub finden Sie unter: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a>.',
     'imp.privacy3':           'Diese Website verwendet keine eigenen Cookies, Tracking-Tools oder Analysedienste. Es werden keine personenbezogenen Daten durch den Betreiber dieser Seite erhoben oder verarbeitet, außer bei direkter Kontaktaufnahme per E-Mail.',
+    'imp.h_logos':            'Bild- & Logonachweise',
+    'imp.logos':              'Einige auf dieser Website dargestellte Logos und Bilder sind Eigentum ihrer jeweiligen Rechteinhaber (z.B. DACH CS, Skinbaron, BIG, Empress, FACEIT, Valve/CS2). Sie werden ausschließlich zu Referenz- und Portfoliozwecken verwendet, um Organisationen zu kennzeichnen, für die ich tätig war. Eine Zugehörigkeit, Partnerschaft oder Empfehlung durch diese Organisationen wird damit nicht suggeriert. Sollten Sie Rechteinhaber sein und der Verwendung Ihres Logos oder Bildes widersprechen, kontaktieren Sie mich bitte unter <a href="mailto:hello@glace-admin.com">hello@glace-admin.com</a> — ich werde es umgehend entfernen.',
   }
 };
 
