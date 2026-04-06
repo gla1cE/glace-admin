@@ -43,7 +43,7 @@ const i18n = {
     'ref3.period':       'LAN · 2026',
     'ref3.desc':         'Supported BIG as on-site admin during Gamescom LAN 2026 — covering a 2-day 5v5 tournament, a Wingman Cup, and a 1v1 Bonus Cup. Acted as tournament admin and on-site contact for all participants in the dedicated admin area.',
     'ref4.period':       'Online · ongoing',
-    'ref4.desc':         'Running the Empress program at DACH CS — exclusively for female CS2 players. Organizing biweekly 2v2 Wingman tournaments ("Wingwomen Cups") and leading the planning of the first 5v5 cup.',
+    'ref4.desc':         'Running the Empress program at DACH CS — exclusively for female CS2 players. Organizing 2v2 Wingman tournaments ("Wingwomen Cups") and leading the planning of the first 5v5 cup.',
 
     'about.tag':         'About Me',
     'about.title':       'The Person Behind Glace Administration',
@@ -128,7 +128,7 @@ const i18n = {
     'ref3.period':       'LAN · 2026',
     'ref3.desc':         'Als Admin für BIG auf der Gamescom LAN 2026 vor Ort — 2-tägiges 5v5-Turnier sowie Wingman- und 1v1-Bonus-Cup. Turnier-Admin und direkter Ansprechpartner für alle Teilnehmer im dedizierten Admin-Bereich.',
     'ref4.period':       'Online · fortlaufend',
-    'ref4.desc':         'Leitung des Empress-Programms bei DACH CS — exklusiv für weibliche CS2-Spielerinnen. Organisation zweiwöchentlicher 2v2-Wingman-Turniere ("Wingwomen Cups") sowie Planung des ersten 5v5-Cups.',
+    'ref4.desc':         'Leitung des Empress-Programms bei DACH CS — exklusiv für weibliche CS2-Spielerinnen. Organisation 2v2-Wingman-Turniere ("Wingwomen Cups") sowie Planung des ersten 5v5-Cups.',
 
     'about.tag':         'Über mich',
     'about.title':       'Die Person hinter Glace Administration',
