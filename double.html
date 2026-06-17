@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Double Elimination Bracket Builder</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --line: #2a2f3a;
+    --line-soft: #232733;
+    --text: #e8eaed;
+    --text-dim: #9aa1ad;
+    --wb: #5b8cff;
+    --wb-bg: rgba(91, 140, 255, 0.12);
+    --wb-line: rgba(91, 140, 255, 0.5);
+    --lb: #f0726b;
+    --lb-bg: rgba(240, 114, 107, 0.12);
+    --lb-line: rgba(240, 114, 107, 0.45);
+    --gf: #e6b450;
+    --gf-bg: rgba(230, 180, 80, 0.13);
+    --bye: #e6b450;
+    --bye-bg: rgba(230, 180, 80, 0.13);
+    --success: #4ec98a;
+    --radius: 10px;
+    --radius-sm: 7px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  .deb {
+    font-family: var(--font); color: var(--text); background: var(--bg);
+    max-width: 1100px; margin: 0 auto; padding: 28px 24px 40px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .deb h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .deb .deb-sub { font-size: 14px; color: var(--text-dim); margin: 0 0 24px; }
+
+  .deb-controls { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 20px; }
+  .deb label { font-size: 13px; color: var(--text-dim); display: block; margin-bottom: 18px; }
+  .deb label b { color: var(--text); font-weight: 600; font-size: 15px; }
+  .deb input[type="range"] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: var(--line); border-radius: 3px; outline: none; margin: 0; }
+  .deb input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--wb); cursor: pointer; border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--wb-line); }
+  .deb input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--wb); cursor: pointer; border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--wb-line); }
+  .deb-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; margin-top: 14px; }
+  .deb-quick { display: flex; flex-wrap: wrap; gap: 7px; }
+  .deb-quick button { background: var(--panel-2); border: 1px solid var(--line); color: var(--text-dim); font: inherit; font-size: 12px; padding: 4px 11px; border-radius: 6px; cursor: pointer; }
+  .deb-quick button:hover { border-color: var(--wb-line); color: var(--text); }
+  .deb-toggle-wrap { display: flex; align-items: center; gap: 8px; margin-left: 28px; }
+  .deb-toggle { display: inline-flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-dim); cursor: pointer; user-select: none; white-space: nowrap; }
+  .deb-toggle-label { white-space: nowrap; }
+  .deb-track { position: relative; width: 34px; height: 19px; background: var(--line); border-radius: 10px; transition: background .2s; flex-shrink: 0; }
+  .deb-track.on { background: #1D9E75; }
+  .deb-knob { position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; background: #fff; border-radius: 50%; transition: transform .2s; }
+  .deb-track.on .deb-knob { transform: translateX(15px); }
+
+  .deb-info {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%; font-family: var(--mono); font-size: 11px;
+    font-weight: 600; color: var(--text-dim); background: var(--panel-2);
+    border: 1px solid var(--line); cursor: help; flex-shrink: 0; outline: none;
+  }
+  .deb-info:hover, .deb-info:focus { color: var(--text); border-color: var(--gf); }
+  .deb-tooltip {
+    position: absolute; top: calc(100% + 9px); right: 0; width: 290px;
+    background: #0b0d11; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 14px; font-family: var(--font); font-size: 12.5px; font-weight: 400;
+    color: var(--text-dim); line-height: 1.55; z-index: 20;
+    opacity: 0; visibility: hidden; transform: translateY(-3px); transition: opacity .15s, transform .15s, visibility .15s;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.5); text-align: left; white-space: normal;
+  }
+  .deb-info:hover .deb-tooltip, .deb-info:focus .deb-tooltip { opacity: 1; visibility: visible; transform: translateY(0); }
+  .deb-tooltip::after {
+    content: ""; position: absolute; bottom: 100%; right: 6px; border: 6px solid transparent;
+    border-bottom-color: var(--line);
+  }
+  .deb-tooltip b { display: block; color: var(--gf); font-weight: 600; font-size: 13px; margin-bottom: 5px; }
+  .deb-tooltip em { color: var(--text); font-style: normal; font-weight: 600; }
+  .deb-tip-ex { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); color: var(--text); }
+  .deb-tip-off { display: block; margin-top: 8px; color: var(--text-dim); }
+  @media (max-width: 520px) { .deb-tooltip { width: 240px; } }
+
+  .deb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .deb-stat { background: var(--panel-2); border-radius: var(--radius-sm); padding: 13px 15px; }
+  .deb-stat .k { font-size: 12px; color: var(--text-dim); margin-bottom: 3px; }
+  .deb-stat .v { font-size: 22px; font-weight: 600; }
+
+  .deb-section-h { font-size: 16px; font-weight: 600; margin: 18px 0 12px; display: flex; align-items: center; gap: 9px; }
+  .deb-section-h .bar { width: 3px; height: 15px; border-radius: 2px; }
+  .deb-section-h.wb .bar { background: var(--wb); }
+  .deb-section-h.lb .bar { background: var(--lb); }
+  .deb-section-h .hint { font-size: 12px; color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+
+  .deb-bracket-wrap { overflow-x: auto; padding-bottom: 12px; margin-bottom: 14px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel); }
+  .deb-bracket { display: flex; gap: 36px; padding: 20px 24px; min-width: min-content; }
+  .deb-round { display: flex; flex-direction: column; min-width: 166px; }
+  .deb-round-title { font-size: 12px; color: var(--text-dim); font-weight: 600; text-align: center; margin-bottom: 12px; }
+  .deb-round-title .badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-left: 5px; font-weight: 600; }
+  .deb-round-title .badge.minor { color: var(--lb); background: var(--lb-bg); }
+  .deb-round-title .badge.major { color: var(--gf); background: var(--gf-bg); }
+  .deb-matches { display: flex; flex-direction: column; justify-content: space-around; flex: 1; gap: 14px; }
+  .deb-match { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .deb-match.wb { border-left: 2px solid var(--wb-line); }
+  .deb-match.lb { border-left: 2px solid var(--lb-line); }
+  .deb-slot { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 13px; }
+  .deb-slot + .deb-slot { border-top: 1px solid var(--line); }
+  .deb-seed { font-family: var(--mono); font-size: 11px; min-width: 22px; text-align: center; color: var(--text-dim); background: var(--bg); border-radius: 4px; padding: 1px 0; font-weight: 600; }
+  .deb-team { color: var(--text); opacity: 0.5; font-style: italic; }
+  .deb-slot.seeded .deb-team { opacity: 0.9; font-style: normal; }
+  .deb-slot.seeded .deb-seed { color: var(--wb); background: var(--wb-bg); }
+  .deb-slot.bye .deb-seed { color: var(--bye); background: var(--bye-bg); }
+  .deb-slot.bye .deb-team { color: var(--bye); opacity: 1; font-style: normal; font-size: 12px; }
+  .deb-slot.drop .deb-team { color: var(--lb); opacity: 0.85; font-style: normal; font-size: 12px; }
+  .deb-slot.drop .deb-seed { color: var(--lb); background: var(--lb-bg); }
+  .deb-match.has-bye { border-color: var(--bye-bg); }
+  .deb-adv { font-size: 11px; color: var(--text-dim); padding: 4px 10px; background: var(--bg); border-top: 1px solid var(--line); }
+  .deb-adv b { color: var(--bye); font-weight: 600; }
+
+  .deb-gf { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+  .deb-gf-card { background: var(--gf-bg); border: 1px solid var(--gf); border-radius: var(--radius); padding: 14px 18px; flex: 1; min-width: 200px; }
+  .deb-gf-card .t { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .deb-gf-card .d { font-size: 13px; color: var(--text-dim); }
+  .deb-gf-card.muted { opacity: 0.45; border-style: dashed; }
+
+  .deb-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; margin-bottom: 22px; }
+  @media (max-width: 720px) { .deb-two { grid-template-columns: 1fr; } }
+  .deb-card { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px 18px; }
+  .deb-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .deb-card-head .t { font-weight: 600; font-size: 15px; }
+  .deb-copy { background: var(--wb-bg); border: 1px solid var(--wb-line); color: #aec1ff; font: inherit; font-size: 12px; padding: 4px 12px; border-radius: 6px; cursor: pointer; }
+  .deb-copy:hover { background: rgba(91,140,255,0.2); }
+  .deb-seedlist { font-family: var(--mono); font-size: 12.5px; max-height: 340px; overflow-y: auto; }
+  .deb-seedrow { display: flex; align-items: center; gap: 10px; padding: 3px 0; border-bottom: 1px solid var(--line-soft); }
+  .deb-seedrow .n { color: var(--text-dim); min-width: 34px; }
+  .deb-seedrow .nm { color: var(--text); opacity: 0.5; }
+  .deb-seedrow .tag { margin-left: auto; font-size: 10.5px; color: var(--bye); background: var(--bye-bg); padding: 1px 7px; border-radius: 5px; font-family: var(--font); font-weight: 600; }
+  .deb-struct { font-size: 13px; }
+  .deb-struct-row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-top: 1px solid var(--line-soft); }
+  .deb-struct-row:first-child { border-top: none; }
+  .deb-struct-row .k { color: var(--text-dim); }
+  .deb-struct-row .v { font-weight: 600; text-align: right; }
+  .deb-note { font-size: 12.5px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+
+  .deb-bye-warn { background: var(--bye-bg); border: 1px solid var(--bye); border-radius: var(--radius); padding: 11px 15px; font-size: 13px; color: #f1d28a; margin-bottom: 22px; display: none; }
+  .deb-bye-warn b { font-weight: 600; }
+  .deb-foot { font-size: 12px; color: var(--text-dim); margin-top: 4px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="deb">
+  <h1>Double elimination bracket builder</h1>
+  <p class="deb-sub">Winners and losers brackets, seeding order, and byes — set up for FACEIT. Toggle the grand final reset to match your rules.</p>
+
+  <div class="deb-controls">
+    <label for="deb-teams">Teams participating: <b id="deb-teams-out">16</b></label>
+    <input type="range" id="deb-teams" min="4" max="128" value="16" step="1">
+    <div class="deb-row">
+      <div class="deb-quick" id="deb-quick"></div>
+      <div class="deb-toggle-wrap">
+        <label class="deb-toggle" id="deb-reset-toggle">
+          <span class="deb-track on" id="deb-track"><span class="deb-knob"></span></span>
+          <span class="deb-toggle-label">Grand final reset</span>
+        </label>
+        <span class="deb-info" tabindex="0" aria-label="What is a grand final reset?">
+          i
+          <span class="deb-tooltip" role="tooltip">
+            <b>Grand final reset (double final)</b>
+            The winners-bracket champion reaches the grand final with zero losses; the losers-bracket champion arrives with one. For a fair finish, the LB team must beat the WB team <em>twice</em>.
+            <span class="deb-tip-ex">Example: WB champ "Team A" meets LB champ "Team B". If B wins game 1, both now have one loss, so a second deciding game is played. If A wins game 1, A is champion immediately \u2014 B already had its one loss.</span>
+            <span class="deb-tip-off">Turn this off for a single grand final: one game decides it, and the LB champion gets no second chance.</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="deb-stats" id="deb-stats"></div>
+
+  <div class="deb-bye-warn" id="deb-bye-warn"></div>
+
+  <div class="deb-section-h wb"><span class="bar"></span>Winners bracket <span class="hint">standard 1-vs-N seeding</span></div>
+  <div class="deb-bracket-wrap"><div class="deb-bracket" id="deb-wb"></div></div>
+
+  <div class="deb-section-h lb"><span class="bar"></span>Losers bracket <span class="hint" id="deb-lb-hint"></span></div>
+  <div class="deb-bracket-wrap"><div class="deb-bracket" id="deb-lb"></div></div>
+
+  <div class="deb-section-h"><span class="bar" style="background:var(--gf)"></span>Grand final</div>
+  <div class="deb-gf" id="deb-gf"></div>
+
+  <div class="deb-two">
+    <div class="deb-card">
+      <div class="deb-card-head"><span class="t">Seeding order for FACEIT</span><button class="deb-copy" id="deb-copy">Copy list</button></div>
+      <div class="deb-seedlist" id="deb-seedlist"></div>
+      <div class="deb-note">Arrange teams in your FACEIT participant list in this order before generating. Seed 1 is strongest. Winners-bracket seeding drives the whole structure.</div>
+    </div>
+    <div class="deb-card">
+      <div class="deb-card-head"><span class="t">Structure summary</span></div>
+      <div class="deb-struct" id="deb-struct"></div>
+    </div>
+  </div>
+
+  <div class="deb-foot" id="deb-foot"></div>
+</div>
+
+<script>
+(function () {
+  function bracketSeedOrder(size) {
+    var rounds = Math.log2(size); var seeds = [1, 2];
+    for (var r = 0; r < rounds - 1; r++) {
+      var next = [], sum = seeds.length * 2 + 1;
+      for (var i = 0; i < seeds.length; i++) { next.push(seeds[i]); next.push(sum - seeds[i]); }
+      seeds = next;
+    }
+    return seeds;
+  }
+
+  function winnerOf(m) {
+    var a = m[0], b = m[1];
+    if (typeof a === 'number' && b === 'BYE') return a;
+    if (typeof b === 'number' && a === 'BYE') return b;
+    return 'TBD';
+  }
+
+  function build(n) {
+    var size = 1; while (size < n) size *= 2;
+    var byes = size - n;
+    var order = bracketSeedOrder(size).map(function (s) { return s <= n ? s : null; });
+
+    var wbR1 = [];
+    for (var i = 0; i < order.length; i += 2) {
+      wbR1.push([order[i] === null ? 'BYE' : order[i], order[i + 1] === null ? 'BYE' : order[i + 1]]);
+    }
+    var WB = [wbR1], cur = wbR1;
+    while (cur.length > 1) {
+      var nxt = [];
+      for (var k = 0; k < cur.length; k += 2) nxt.push([winnerOf(cur[k]), winnerOf(cur[k + 1])]);
+      WB.push(nxt); cur = nxt;
+    }
+
+    var LB = [], matches = size / 4, round = 1, wbFeed = 1;
+    while (matches >= 1) {
+      LB.push({ round: round++, type: 'minor', matches: matches, feeds: 'LB survivors' });
+      wbFeed++;
+      if (matches >= 1) LB.push({ round: round++, type: 'major', matches: matches, feeds: 'WB R' + wbFeed + ' losers' });
+      matches = matches / 2;
+    }
+    LB = LB.filter(function (r) { return r.matches >= 1; });
+
+    return { size: size, byes: byes, order: order, WB: WB, LB: LB };
+  }
+
+  function wbRoundName(matchesInRound, totalRounds, idx) {
+    var fromEnd = totalRounds - idx;
+    if (fromEnd === 1) return 'WB Final';
+    if (fromEnd === 2) return 'WB Semis';
+    return 'WB Round ' + (idx + 1);
+  }
+
+  function seedCell(v, kind) {
+    if (v === 'BYE') return '<div class="deb-slot bye"><span class="deb-seed">BYE</span><span class="deb-team">empty</span></div>';
+    if (v === 'TBD') return '<div class="deb-slot"><span class="deb-seed">\u2013</span><span class="deb-team">Winner</span></div>';
+    if (typeof v === 'number') {
+      var cls = kind === 'r1' ? '' : 'seeded';
+      return '<div class="deb-slot ' + cls + '"><span class="deb-seed">' + v + '</span><span class="deb-team">Team ' + v + '</span></div>';
+    }
+    return '<div class="deb-slot"><span class="deb-seed">\u2013</span><span class="deb-team">Winner</span></div>';
+  }
+
+  function lbSlot(label, drop) {
+    if (drop) return '<div class="deb-slot drop"><span class="deb-seed">\u2193</span><span class="deb-team">' + label + '</span></div>';
+    return '<div class="deb-slot"><span class="deb-seed">\u2013</span><span class="deb-team">' + label + '</span></div>';
+  }
+
+  function render(n, reset) {
+    var d = build(n);
+    var totalRounds = Math.log2(d.size);
+    var wbMatches = d.size - 1;
+    var lbMatches = d.LB.reduce(function (a, r) { return a + r.matches; }, 0);
+    var gfMatches = reset ? 2 : 1;
+    var totalMax = wbMatches + lbMatches + gfMatches;
+
+    var realR1 = d.WB[0].filter(function (m) { return m[0] !== 'BYE' && m[1] !== 'BYE'; }).length;
+
+    document.getElementById('deb-stats').innerHTML =
+      stat('Bracket size', d.size) +
+      stat('WB rounds', totalRounds) +
+      stat('LB rounds', d.LB.length) +
+      stat('Max matches', totalMax) +
+      stat('Byes', d.byes);
+
+    var wbCols = [];
+    for (var r = 0; r < d.WB.length; r++) {
+      var rm = d.WB[r];
+      var h = '<div class="deb-round"><div class="deb-round-title">' + wbRoundName(rm.length, totalRounds, r) + '</div><div class="deb-matches">';
+      for (var m = 0; m < rm.length; m++) {
+        var a = rm[m][0], b = rm[m][1];
+        if (r === 0) {
+          var aBye = a === 'BYE', bBye = b === 'BYE', hasBye = aBye || bBye, adv = '';
+          if (hasBye) { var w = aBye ? b : a; adv = '<div class="deb-adv">Seed <b>' + w + '</b> advances free</div>'; }
+          h += '<div class="deb-match wb' + (hasBye ? ' has-bye' : '') + '">' + seedCell(a, 'r1') + seedCell(b, 'r1') + adv + '</div>';
+        } else {
+          h += '<div class="deb-match wb">' + seedCell(a, 'adv') + seedCell(b, 'adv') + '</div>';
+        }
+      }
+      h += '</div></div>';
+      wbCols.push(h);
+    }
+    document.getElementById('deb-wb').innerHTML = wbCols.join('');
+
+    var lbCols = [];
+    for (var li = 0; li < d.LB.length; li++) {
+      var lr = d.LB[li];
+      var badge = '<span class="badge ' + lr.type + '">' + (lr.type === 'major' ? 'drop-in' : 'survivors') + '</span>';
+      var hh = '<div class="deb-round"><div class="deb-round-title">LB R' + lr.round + badge + '</div><div class="deb-matches">';
+      for (var mm = 0; mm < lr.matches; mm++) {
+        if (lr.type === 'major') {
+          hh += '<div class="deb-match lb">' + lbSlot('LB winner') + lbSlot(lr.feeds.replace(' losers', ''), true) + '</div>';
+        } else if (li === 0) {
+          hh += '<div class="deb-match lb">' + lbSlot('WB R1 loser', true) + lbSlot('WB R1 loser', true) + '</div>';
+        } else {
+          hh += '<div class="deb-match lb">' + lbSlot('LB winner') + lbSlot('LB winner') + '</div>';
+        }
+      }
+      hh += '</div></div>';
+      lbCols.push(hh);
+    }
+    document.getElementById('deb-lb').innerHTML = lbCols.join('');
+    document.getElementById('deb-lb-hint').textContent = d.LB.length + ' rounds \u00b7 alternating survivors / drop-in';
+
+    var gfHtml = '<div class="deb-gf-card"><div class="t">Grand final</div><div class="d">WB champion vs LB champion \u00b7 1 match</div></div>';
+    gfHtml += '<div class="deb-gf-card' + (reset ? '' : ' muted') + '"><div class="t">Bracket reset' + (reset ? '' : ' (off)') + '</div><div class="d">' +
+      (reset ? 'If the LB champion wins game 1, a decider is played \u2014 both have one loss.' : 'Single grand final. LB champion is not given a second chance.') + '</div></div>';
+    document.getElementById('deb-gf').innerHTML = gfHtml;
+
+    var byeSet = {};
+    d.WB[0].forEach(function (p) {
+      if (p[0] === 'BYE' && p[1] !== 'BYE') byeSet[p[1]] = true;
+      if (p[1] === 'BYE' && p[0] !== 'BYE') byeSet[p[0]] = true;
+    });
+    var listHtml = '';
+    for (var s = 1; s <= n; s++) {
+      listHtml += '<div class="deb-seedrow"><span class="n">#' + s + '</span><span class="nm">Team ' + s + '</span>' + (byeSet[s] ? '<span class="tag">bye</span>' : '') + '</div>';
+    }
+    document.getElementById('deb-seedlist').innerHTML = listHtml;
+
+    document.getElementById('deb-struct').innerHTML =
+      structRow('Teams', n) +
+      structRow('Bracket size', d.size + (d.byes ? ' (rounded up)' : '')) +
+      structRow('WB matches', wbMatches) +
+      structRow('LB matches', lbMatches) +
+      structRow('Grand final', reset ? '1 + possible reset' : '1') +
+      structRow('Total matches', (reset ? (totalMax - 1) + '\u2013' + totalMax : String(totalMax))) +
+      structRow('Min losses to exit', '2');
+
+    var warn = document.getElementById('deb-bye-warn');
+    if (d.byes > 0) {
+      var byeSeeds = Object.keys(byeSet).map(Number).sort(function (a, b) { return a - b; });
+      warn.style.display = 'block';
+      warn.innerHTML = '<b>' + d.byes + ' byes:</b> seeds ' + byeSeeds.join(', ') + ' skip WB round 1. Because those slots have no loser, the matching early losers-bracket slots resolve automatically \u2014 FACEIT fills them when it generates the bracket. The losers tree below shows the full rounded structure.';
+    } else {
+      warn.style.display = 'none';
+    }
+
+    document.getElementById('deb-foot').textContent =
+      'Each team must lose twice to be eliminated. Losers-bracket rounds alternate between "survivors" (LB teams play each other) and "drop-in" (LB survivors meet fresh losers falling from the winners bracket). This mirrors FACEIT\u2019s standard double-elimination generation.';
+
+    window.__seedList = (function () {
+      var lines = [];
+      for (var s2 = 1; s2 <= n; s2++) lines.push(s2 + '. Team ' + s2 + (byeSet[s2] ? '  (bye)' : ''));
+      return lines.join('\n');
+    })();
+  }
+
+  function stat(k, v) { return '<div class="deb-stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
+  function structRow(k, v) { return '<div class="deb-struct-row"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>'; }
+
+  var slider = document.getElementById('deb-teams');
+  var out = document.getElementById('deb-teams-out');
+  var resetOn = true;
+  function update() { out.textContent = slider.value; render(+slider.value, resetOn); }
+  slider.addEventListener('input', update);
+
+  document.getElementById('deb-reset-toggle').addEventListener('click', function () {
+    resetOn = !resetOn;
+    document.getElementById('deb-track').classList.toggle('on', resetOn);
+    update();
+  });
+
+  var quick = [8, 16, 24, 32, 48, 64, 96, 128];
+  document.getElementById('deb-quick').innerHTML = quick.map(function (q) { return '<button data-n="' + q + '">' + q + '</button>'; }).join('');
+  document.getElementById('deb-quick').addEventListener('click', function (e) {
+    if (e.target.tagName === 'BUTTON') { slider.value = e.target.getAttribute('data-n'); update(); }
+  });
+
+  document.getElementById('deb-copy').addEventListener('click', function () {
+    var btn = this;
+    navigator.clipboard.writeText(window.__seedList || '').then(function () {
+      btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy list'; }, 1400);
+    }).catch(function () { btn.textContent = 'Press Ctrl+C'; });
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single Elimination Bracket Builder</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --line: #2a2f3a;
+    --line-soft: #232733;
+    --text: #e8eaed;
+    --text-dim: #9aa1ad;
+    --accent: #5b8cff;
+    --accent-bg: rgba(91, 140, 255, 0.12);
+    --accent-line: rgba(91, 140, 255, 0.55);
+    --bye: #e6b450;
+    --bye-bg: rgba(230, 180, 80, 0.13);
+    --success: #4ec98a;
+    --radius: 10px;
+    --radius-sm: 7px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); }
+  .seb {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .seb h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .seb .seb-sub { font-size: 14px; color: var(--text-dim); margin: 0 0 24px; }
+
+  .seb-controls {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .seb label { font-size: 13px; color: var(--text-dim); display: block; margin-bottom: 10px; }
+  .seb label b { color: var(--text); font-weight: 600; font-size: 15px; }
+  .seb input[type="range"] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 4px; background: var(--line); border-radius: 3px; outline: none; margin: 0;
+  }
+  .seb input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+    border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--accent-line);
+  }
+  .seb input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--accent);
+    cursor: pointer; border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--accent-line);
+  }
+  .seb-quick { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .seb-quick button {
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--text-dim);
+    font: inherit; font-size: 12px; padding: 4px 11px; border-radius: 6px; cursor: pointer;
+  }
+  .seb-quick button:hover { border-color: var(--accent-line); color: var(--text); }
+
+  .seb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .seb-stat { background: var(--panel-2); border-radius: var(--radius-sm); padding: 13px 15px; }
+  .seb-stat .k { font-size: 12px; color: var(--text-dim); margin-bottom: 3px; }
+  .seb-stat .v { font-size: 22px; font-weight: 600; }
+
+  .seb-section-h { font-size: 16px; font-weight: 600; margin: 6px 0 12px; display: flex; align-items: center; gap: 9px; }
+  .seb-section-h .bar { width: 3px; height: 15px; background: var(--accent); border-radius: 2px; }
+
+  .seb-bracket-wrap { overflow-x: auto; padding-bottom: 12px; margin-bottom: 26px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel); }
+  .seb-bracket { display: flex; gap: 38px; padding: 20px 24px; min-width: min-content; align-items: stretch; }
+  .seb-round { display: flex; flex-direction: column; justify-content: space-around; min-width: 168px; }
+  .seb-round-title { font-size: 12px; color: var(--text-dim); font-weight: 600; text-align: center; margin-bottom: 12px; position: sticky; top: 0; }
+  .seb-matches { display: flex; flex-direction: column; justify-content: space-around; flex: 1; gap: 14px; }
+  .seb-match {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+    overflow: hidden; position: relative;
+  }
+  .seb-slot { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 13px; }
+  .seb-slot + .seb-slot { border-top: 1px solid var(--line); }
+  .seb-seed {
+    font-family: var(--mono); font-size: 11px; min-width: 22px; text-align: center;
+    color: var(--text-dim); background: var(--bg); border-radius: 4px; padding: 1px 0; font-weight: 600;
+  }
+  .seb-team { color: var(--text); opacity: 0.55; font-style: italic; }
+  .seb-slot.bye .seb-seed { color: var(--bye); background: var(--bye-bg); }
+  .seb-slot.bye .seb-team { color: var(--bye); opacity: 1; font-style: normal; font-size: 12px; }
+  .seb-slot.seeded-adv .seb-team { opacity: 0.9; font-style: normal; color: var(--text); }
+  .seb-slot.seeded-adv .seb-seed { color: var(--bye); background: var(--bye-bg); }
+  .seb-match.has-bye { border-color: var(--bye-bg); }
+  .seb-adv {
+    font-size: 11px; color: var(--text-dim); padding: 4px 10px;
+    background: var(--bg); border-top: 1px solid var(--line);
+  }
+  .seb-adv b { color: var(--bye); font-weight: 600; }
+
+  .seb-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 720px) { .seb-two { grid-template-columns: 1fr; } }
+
+  .seb-list-card, .seb-bye-card {
+    background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px 18px;
+  }
+  .seb-list-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .seb-list-head .t { font-weight: 600; font-size: 15px; }
+  .seb-copy {
+    background: var(--accent-bg); border: 1px solid var(--accent-line); color: #aec1ff;
+    font: inherit; font-size: 12px; padding: 4px 12px; border-radius: 6px; cursor: pointer;
+  }
+  .seb-copy:hover { background: rgba(91,140,255,0.2); }
+  .seb-seedlist { font-family: var(--mono); font-size: 12.5px; max-height: 360px; overflow-y: auto; }
+  .seb-seedrow { display: flex; align-items: center; gap: 10px; padding: 3px 0; border-bottom: 1px solid var(--line-soft); }
+  .seb-seedrow .n { color: var(--text-dim); min-width: 34px; }
+  .seb-seedrow .nm { color: var(--text); opacity: 0.5; }
+  .seb-seedrow .tag { margin-left: auto; font-size: 10.5px; color: var(--bye); background: var(--bye-bg); padding: 1px 7px; border-radius: 5px; font-family: var(--font); font-weight: 600; }
+
+  .seb-bye-list { font-size: 13px; line-height: 1.9; }
+  .seb-bye-pill { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--bye); background: var(--bye-bg); padding: 2px 9px; border-radius: 5px; margin: 0 4px 4px 0; font-weight: 600; }
+  .seb-note { font-size: 12.5px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+
+  .seb-foot { font-size: 12px; color: var(--text-dim); margin-top: 24px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="seb">
+  <h1>Single elimination bracket builder</h1>
+  <p class="seb-sub">Pick your team count. The full match tree, seeding order, and byes update live — ready to set up on FACEIT.</p>
+
+  <div class="seb-controls">
+    <label for="seb-teams">Teams participating: <b id="seb-teams-out">16</b></label>
+    <input type="range" id="seb-teams" min="4" max="128" value="16" step="1">
+    <div class="seb-quick" id="seb-quick"></div>
+  </div>
+
+  <div class="seb-stats" id="seb-stats"></div>
+
+  <div class="seb-section-h"><span class="bar"></span>Match tree</div>
+  <div class="seb-bracket-wrap">
+    <div class="seb-bracket" id="seb-bracket"></div>
+  </div>
+
+  <div class="seb-two">
+    <div class="seb-list-card">
+      <div class="seb-list-head">
+        <span class="t">Seeding order for FACEIT</span>
+        <button class="seb-copy" id="seb-copy">Copy list</button>
+      </div>
+      <div class="seb-seedlist" id="seb-seedlist"></div>
+      <div class="seb-note">Arrange teams in your FACEIT participant list in this exact order before generating the bracket. Seed 1 is your strongest team.</div>
+    </div>
+    <div class="seb-bye-card">
+      <div class="seb-list-head"><span class="t">Round 1 byes</span></div>
+      <div class="seb-bye-list" id="seb-byes"></div>
+      <div class="seb-note" id="seb-bye-note"></div>
+    </div>
+  </div>
+
+  <div class="seb-foot">
+    Standard seeding (1 vs N): the top seed meets the bottom seed, and byes go to the highest seeds so the strongest teams skip round 1. Italic slots are where your team names go. This mirrors how FACEIT generates a standard single-elimination bracket — set seeding to "manual" or arrange the participant order to match.
+  </div>
+</div>
+
+<script>
+(function () {
+  function bracketSeedOrder(size) {
+    var rounds = Math.log2(size);
+    var seeds = [1, 2];
+    for (var r = 0; r < rounds - 1; r++) {
+      var next = [];
+      var sum = seeds.length * 2 + 1;
+      for (var i = 0; i < seeds.length; i++) {
+        next.push(seeds[i]);
+        next.push(sum - seeds[i]);
+      }
+      seeds = next;
+    }
+    return seeds;
+  }
+
+  function build(n) {
+    var size = 1; while (size < n) size *= 2;
+    var byes = size - n;
+    var order = bracketSeedOrder(size);
+    var slots = order.map(function (s) { return s <= n ? s : null; });
+    return { size: size, byes: byes, order: order, slots: slots };
+  }
+
+  function roundName(matchesInRound, totalRounds, roundIdx) {
+    var fromEnd = totalRounds - roundIdx;
+    if (fromEnd === 1) return 'Final';
+    if (fromEnd === 2) return 'Semifinals';
+    if (fromEnd === 3) return 'Quarterfinals';
+    return 'Round ' + (roundIdx + 1) + ' \u00b7 ' + matchesInRound + ' matches';
+  }
+
+  function seedCell(seed, isBye) {
+    if (isBye) {
+      return '<div class="seb-slot bye"><span class="seb-seed">BYE</span><span class="seb-team">advances seed</span></div>';
+    }
+    return '<div class="seb-slot"><span class="seb-seed">' + seed + '</span><span class="seb-team">Team ' + seed + '</span></div>';
+  }
+
+  function advSlot(seed) {
+    if (typeof seed === 'number') {
+      return '<div class="seb-slot seeded-adv"><span class="seb-seed">' + seed + '</span><span class="seb-team">Team ' + seed + '</span></div>';
+    }
+    return '<div class="seb-slot"><span class="seb-seed">\u2013</span><span class="seb-team">Winner</span></div>';
+  }
+
+  function render(n) {
+    var data = build(n);
+    var totalRounds = Math.log2(data.size);
+
+    // stats
+    var totalMatches = data.size - 1;
+    var realR1 = 0;
+    for (var i = 0; i < data.slots.length; i += 2) {
+      if (data.slots[i] !== null && data.slots[i + 1] !== null) realR1++;
+    }
+    document.getElementById('seb-stats').innerHTML =
+      stat('Bracket size', data.size) +
+      stat('Total rounds', totalRounds) +
+      stat('Total matches', totalMatches) +
+      stat('Round 1 matches', realR1) +
+      stat('Byes', data.byes);
+
+    // build round 1 pairs
+    // slot values: a seed number (known team), 'BYE' (empty bye slot, no opponent),
+    // or 'TBD' (winner of a real match, not yet known).
+    // Only a real round-1 bye (seed vs empty BYE slot) resolves to a known advancer;
+    // a known seed facing a TBD opponent has NOT played yet, so its winner is TBD.
+    function winnerOf(match) {
+      var a = match[0], b = match[1];
+      if (typeof a === 'number' && b === 'BYE') return a;
+      if (typeof b === 'number' && a === 'BYE') return b;
+      return 'TBD';
+    }
+
+    var r1 = [];
+    for (var j = 0; j < data.slots.length; j += 2) {
+      var top = data.slots[j] === null ? 'BYE' : data.slots[j];
+      var bot = data.slots[j + 1] === null ? 'BYE' : data.slots[j + 1];
+      r1.push([top, bot]);
+    }
+
+    // build every round, propagating only known bye advancers (one round forward)
+    var allRounds = [r1];
+    var cur = r1;
+    while (cur.length > 1) {
+      var nxt = [];
+      for (var k = 0; k < cur.length; k += 2) {
+        nxt.push([winnerOf(cur[k]), winnerOf(cur[k + 1])]);
+      }
+      allRounds.push(nxt);
+      cur = nxt;
+    }
+
+    // render columns
+    var cols = [];
+    for (var r = 0; r < allRounds.length; r++) {
+      var roundMatches = allRounds[r];
+      var html = '<div class="seb-round"><div class="seb-round-title">' +
+        roundName(roundMatches.length, totalRounds, r) + '</div><div class="seb-matches">';
+      for (var m = 0; m < roundMatches.length; m++) {
+        var a = roundMatches[m][0], b = roundMatches[m][1];
+        if (r === 0) {
+          var aBye = a === 'BYE', bBye = b === 'BYE';
+          var hasBye = aBye || bBye;
+          var adv = '';
+          if (hasBye) {
+            var winner = aBye ? b : a;
+            adv = '<div class="seb-adv">Seed <b>' + winner + '</b> advances free</div>';
+          }
+          html += '<div class="seb-match' + (hasBye ? ' has-bye' : '') + '">' +
+            seedCell(a, aBye) + seedCell(b, bBye) + adv + '</div>';
+        } else {
+          html += '<div class="seb-match">' + advSlot(a) + advSlot(b) + '</div>';
+        }
+      }
+      html += '</div></div>';
+      cols.push(html);
+    }
+    document.getElementById('seb-bracket').innerHTML = cols.join('');
+
+    // seeding list
+    var listHtml = '';
+    var byeSet = {};
+    r1.forEach(function (p) {
+      if (p[0] === null && p[1] !== null) byeSet[p[1]] = true;
+      if (p[1] === null && p[0] !== null) byeSet[p[0]] = true;
+    });
+    for (var s = 1; s <= n; s++) {
+      listHtml += '<div class="seb-seedrow"><span class="n">#' + s + '</span><span class="nm">Team ' + s + '</span>' +
+        (byeSet[s] ? '<span class="tag">bye</span>' : '') + '</div>';
+    }
+    document.getElementById('seb-seedlist').innerHTML = listHtml;
+
+    // byes
+    var byeSeeds = Object.keys(byeSet).map(Number).sort(function (a, b) { return a - b; });
+    var byeEl = document.getElementById('seb-byes');
+    var byeNote = document.getElementById('seb-bye-note');
+    if (byeSeeds.length === 0) {
+      byeEl.innerHTML = '<span style="color:var(--text-dim)">None \u2014 ' + n + ' is a power of two, so every team plays round 1.</span>';
+      byeNote.textContent = '';
+    } else {
+      byeEl.innerHTML = byeSeeds.map(function (s) { return '<span class="seb-bye-pill">Seed ' + s + '</span>'; }).join('');
+      byeNote.textContent = 'These ' + byeSeeds.length + ' top seeds skip round 1 and enter directly in round 2, because the field is ' + data.byes + ' short of a full ' + data.size + '-team bracket.';
+    }
+
+    window.__seedList = (function () {
+      var lines = [];
+      for (var s = 1; s <= n; s++) lines.push(s + '. Team ' + s + (byeSet[s] ? '  (bye)' : ''));
+      return lines.join('\n');
+    })();
+  }
+
+  function stat(k, v) {
+    return '<div class="seb-stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
+  }
+
+  var slider = document.getElementById('seb-teams');
+  var out = document.getElementById('seb-teams-out');
+  function update() { out.textContent = slider.value; render(+slider.value); }
+  slider.addEventListener('input', update);
+
+  var quick = [8, 16, 24, 32, 48, 64, 96, 128];
+  document.getElementById('seb-quick').innerHTML = quick.map(function (q) {
+    return '<button data-n="' + q + '">' + q + '</button>';
+  }).join('');
+  document.getElementById('seb-quick').addEventListener('click', function (e) {
+    if (e.target.tagName === 'BUTTON') { slider.value = e.target.getAttribute('data-n'); update(); }
+  });
+
+  document.getElementById('seb-copy').addEventListener('click', function () {
+    var btn = this;
+    navigator.clipboard.writeText(window.__seedList || '').then(function () {
+      btn.textContent = 'Copied';
+      setTimeout(function () { btn.textContent = 'Copy list'; }, 1400);
+    }).catch(function () {
+      btn.textContent = 'Press Ctrl+C';
+    });
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>
