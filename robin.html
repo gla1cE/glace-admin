@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round Robin Group Balancer</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --line: #2a2f3a;
+    --line-soft: #232733;
+    --text: #e8eaed;
+    --text-dim: #9aa1ad;
+    --accent: #1D9E75;
+    --accent-bg: rgba(29, 158, 117, 0.13);
+    --accent-line: rgba(29, 158, 117, 0.5);
+    --good: #4ec98a;
+    --good-bg: rgba(78, 201, 138, 0.13);
+    --warn: #e6b450;
+    --warn-bg: rgba(230, 180, 80, 0.13);
+    --bad: #f0726b;
+    --bad-bg: rgba(240, 114, 107, 0.13);
+    --radius: 10px;
+    --radius-sm: 7px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); }
+  .rrb { font-family: var(--font); color: var(--text); background: var(--bg); max-width: 1100px; margin: 0 auto; padding: 28px 24px 40px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .rrb h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .rrb .rrb-sub { font-size: 14px; color: var(--text-dim); margin: 0 0 22px; }
+
+  .rrb-cols { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .rrb-cols { grid-template-columns: 1fr; } }
+
+  .rrb-panel { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px 18px; }
+  .rrb-panel h2 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+
+  .rrb-label { font-size: 12px; color: var(--text-dim); display: block; margin-bottom: 6px; }
+  .rrb input[type="text"], .rrb input[type="number"], .rrb textarea {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    font: inherit; font-size: 14px; padding: 8px 10px; border-radius: var(--radius-sm); outline: none;
+  }
+  .rrb input:focus, .rrb textarea:focus { border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-bg); }
+  .rrb textarea { resize: vertical; min-height: 70px; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; }
+
+  .rrb-add-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .rrb-add-row input[type="text"] { flex: 2; }
+  .rrb-add-row input[type="number"] { flex: 1; min-width: 0; }
+  .rrb-btn { background: var(--accent-bg); border: 1px solid var(--accent-line); color: #7fe0c0; font: inherit; font-size: 13px; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; }
+  .rrb-btn:hover { background: rgba(29,158,117,0.22); }
+  .rrb-btn.sm { padding: 4px 10px; font-size: 12px; }
+  .rrb-btn.ghost { background: var(--panel-2); border-color: var(--line); color: var(--text-dim); }
+  .rrb-btn.ghost:hover { color: var(--text); border-color: var(--accent-line); }
+
+  .rrb-divider { height: 1px; background: var(--line-soft); margin: 16px 0; }
+  .rrb-paste-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+  .rrb-teamlist { margin-top: 14px; max-height: 240px; overflow-y: auto; }
+  .rrb-team-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; font-size: 13px; }
+  .rrb-team-item:hover { background: var(--panel-2); }
+  .rrb-team-item .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rrb-team-item .el { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+  .rrb-team-item .rm { cursor: pointer; color: var(--text-dim); border: none; background: none; font-size: 15px; padding: 0 4px; }
+  .rrb-team-item .rm:hover { color: var(--bad); }
+
+  .rrb-controls-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; }
+  .rrb-controls-row .field { display: flex; flex-direction: column; }
+  .rrb-controls-row input[type="number"] { width: 90px; }
+  .rrb-spacer { flex: 1; }
+
+  .rrb-summary { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
+  .rrb-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .rrb-metric { }
+  .rrb-metric .k { font-size: 11.5px; color: var(--text-dim); margin-bottom: 2px; }
+  .rrb-metric .v { font-size: 20px; font-weight: 600; }
+  .rrb-metric .v small { font-size: 12px; color: var(--text-dim); font-weight: 400; }
+
+  .rrb-balance-badge { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 7px; font-size: 13px; font-weight: 600; margin-top: 4px; }
+  .rrb-balance-badge.good { background: var(--good-bg); color: var(--good); }
+  .rrb-balance-badge.warn { background: var(--warn-bg); color: var(--warn); }
+  .rrb-balance-badge.bad { background: var(--bad-bg); color: var(--bad); }
+
+  .rrb-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .rrb-group { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); overflow: hidden; }
+  .rrb-group-head { padding: 10px 14px; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: baseline; }
+  .rrb-group-head .gname { font-weight: 600; font-size: 14px; }
+  .rrb-group-head .gavg { font-family: var(--mono); font-size: 13px; color: var(--accent); font-weight: 600; }
+  .rrb-group-stats { display: flex; gap: 10px; padding: 7px 14px; font-size: 11px; color: var(--text-dim); border-bottom: 1px solid var(--line-soft); flex-wrap: wrap; }
+  .rrb-group-stats span b { color: var(--text); font-weight: 600; font-family: var(--mono); }
+  .rrb-group-teams { padding: 6px; }
+  .rrb-gt { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 13px; }
+  .rrb-gt:hover { background: var(--panel-2); }
+  .rrb-gt .seed { font-family: var(--mono); font-size: 11px; color: var(--text-dim); min-width: 18px; }
+  .rrb-gt .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rrb-gt .el { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+  .rrb-gt select { background: var(--panel-2); border: 1px solid var(--line); color: var(--text-dim); font-size: 11px; border-radius: 5px; padding: 1px 3px; cursor: pointer; }
+  .rrb-gt select:hover { color: var(--text); }
+
+  .rrb-gaps { padding: 8px 14px 12px; border-top: 1px solid var(--line-soft); }
+  .rrb-gaps .gaps-h { font-size: 11px; color: var(--text-dim); margin-bottom: 7px; }
+  .rrb-gap-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; padding: 2px 0; }
+  .rrb-gap-row .pair { color: var(--text-dim); min-width: 96px; font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rrb-gap-bar-track { flex: 1; height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+  .rrb-gap-bar { height: 100%; border-radius: 3px; }
+  .rrb-gap-row .gv { font-family: var(--mono); font-size: 11px; min-width: 36px; text-align: right; }
+
+  .rrb-empty { color: var(--text-dim); font-size: 14px; padding: 40px 20px; text-align: center; }
+  .rrb-note { font-size: 12px; color: var(--text-dim); margin-top: 16px; line-height: 1.6; }
+  .rrb-note code { font-family: var(--mono); background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="rrb">
+  <h1>Round robin group balancer</h1>
+  <p class="rrb-sub">Enter teams with their Elo, choose how many groups, and check balance — within each group and across all groups.</p>
+
+  <div class="rrb-cols">
+    <div>
+      <div class="rrb-panel">
+        <h2>Add teams</h2>
+        <div class="rrb-add-row">
+          <input type="text" id="rrb-name" placeholder="Team name">
+          <input type="number" id="rrb-elo" placeholder="Elo">
+          <button class="rrb-btn" id="rrb-add">Add</button>
+        </div>
+        <div class="rrb-divider"></div>
+        <label class="rrb-label">Or paste a list \u2014 one per line, <code style="font-family:var(--mono)">Name, Elo</code></label>
+        <textarea id="rrb-paste" placeholder="Aurora, 2150&#10;Nimbus, 1980&#10;Vortex, 1820"></textarea>
+        <div class="rrb-paste-actions">
+          <button class="rrb-btn sm" id="rrb-paste-btn">Import list</button>
+          <button class="rrb-btn sm ghost" id="rrb-sample">Load sample</button>
+          <button class="rrb-btn sm ghost" id="rrb-clear">Clear all</button>
+        </div>
+        <div class="rrb-teamlist" id="rrb-teamlist"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="rrb-controls-row">
+        <div class="field">
+          <label class="rrb-label">Number of groups</label>
+          <input type="number" id="rrb-groups-n" value="4" min="2" max="16" step="1">
+        </div>
+        <button class="rrb-btn" id="rrb-balance">Auto-balance (snake draft)</button>
+        <div class="rrb-spacer"></div>
+        <span id="rrb-team-count" style="font-size:13px;color:var(--text-dim)"></span>
+      </div>
+
+      <div id="rrb-output"></div>
+    </div>
+  </div>
+
+  <div class="rrb-note">
+    <b style="color:var(--text);font-weight:600">On FACEIT Elo:</b> Elo is a per-player rating, so a team's strength is the average of its roster's Elo \u2014 read it off the team page or a finder tool and enter it here. Pulling it automatically from a team link isn't possible in a self-contained page, since FACEIT's data API needs a private key and blocks browser requests.<br><br>
+    <b style="color:var(--text);font-weight:600">Reading the metrics:</b> <code>Group avg spread</code> measures balance <em>across</em> groups (lower = groups are evenly matched). <code>Range</code> and <code>SD</code> inside a group measure balance <em>within</em> it. Per-matchup gaps show the Elo difference each round-robin game would have \u2014 a high max gap means at least one lopsided match even if the group average looks fair. Snake draft equalizes group averages first; it does not minimize internal gaps.
+  </div>
+</div>
+
+<script>
+(function () {
+  var teams = [];
+  var groups = [];
+  var groupCount = 4;
+
+  function letter(i) { return String.fromCharCode(65 + i); }
+  function round(x) { return Math.round(x); }
+
+  function statsOf(group) {
+    if (!group.length) return { avg: 0, min: 0, max: 0, range: 0, sd: 0, n: 0 };
+    var e = group.map(function (t) { return t.elo; });
+    var avg = e.reduce(function (a, b) { return a + b; }, 0) / e.length;
+    var mn = Math.min.apply(null, e), mx = Math.max.apply(null, e);
+    var variance = e.reduce(function (a, b) { return a + (b - avg) * (b - avg); }, 0) / e.length;
+    return { avg: round(avg), min: mn, max: mx, range: mx - mn, sd: round(Math.sqrt(variance)), n: e.length };
+  }
+
+  function pairGaps(group) {
+    var out = [];
+    for (var i = 0; i < group.length; i++) {
+      for (var j = i + 1; j < group.length; j++) {
+        out.push({ a: group[i], b: group[j], gap: Math.abs(group[i].elo - group[j].elo) });
+      }
+    }
+    out.sort(function (x, y) { return y.gap - x.gap; });
+    return out;
+  }
+
+  function snakeDraft() {
+    var sorted = teams.slice().sort(function (a, b) { return b.elo - a.elo; });
+    var G = groupCount;
+    var gs = [];
+    for (var i = 0; i < G; i++) gs.push([]);
+    var dir = 1, g = 0;
+    sorted.forEach(function (t) {
+      gs[g].push(t);
+      if (dir === 1) { if (g === G - 1) dir = -1; else g++; }
+      else { if (g === 0) dir = 1; else g--; }
+    });
+    groups = gs;
+  }
+
+  function ensureGroups() {
+    if (!groups.length || groups.reduce(function (a, g) { return a + g.length; }, 0) !== teams.length) {
+      snakeDraft();
+    }
+  }
+
+  function gapColor(gap, maxScale) {
+    var r = maxScale ? gap / maxScale : 0;
+    if (r < 0.34) return 'var(--good)';
+    if (r < 0.67) return 'var(--warn)';
+    return 'var(--bad)';
+  }
+
+  function render() {
+    document.getElementById('rrb-team-count').textContent = teams.length + ' teams';
+    renderTeamList();
+
+    var out = document.getElementById('rrb-output');
+    if (teams.length < groupCount) {
+      out.innerHTML = '<div class="rrb-summary"><div class="rrb-empty">Add at least ' + groupCount + ' teams (one per group) to see balance.</div></div>';
+      return;
+    }
+    ensureGroups();
+
+    var groupStats = groups.map(statsOf);
+    var avgs = groupStats.map(function (s) { return s.avg; });
+    var gMax = Math.max.apply(null, avgs), gMin = Math.min.apply(null, avgs);
+    var gMean = avgs.reduce(function (a, b) { return a + b; }, 0) / avgs.length;
+    var gSpread = round(Math.sqrt(avgs.reduce(function (a, b) { return a + (b - gMean) * (b - gMean); }, 0) / avgs.length));
+    var avgRange = gMax - gMin;
+
+    // overall max matchup gap across all groups, for shared bar scaling
+    var allGaps = [];
+    groups.forEach(function (g) { pairGaps(g).forEach(function (p) { allGaps.push(p.gap); }); });
+    var globalMaxGap = allGaps.length ? Math.max.apply(null, allGaps) : 1;
+
+    // balance verdict based on group-avg range relative to overall elo spread
+    var allElo = teams.map(function (t) { return t.elo; });
+    var eloSpread = Math.max.apply(null, allElo) - Math.min.apply(null, allElo);
+    var ratio = eloSpread ? avgRange / eloSpread : 0;
+    var verdict, vClass;
+    if (avgRange <= 50 || ratio < 0.06) { verdict = 'Well balanced'; vClass = 'good'; }
+    else if (avgRange <= 150 || ratio < 0.15) { verdict = 'Reasonably balanced'; vClass = 'warn'; }
+    else { verdict = 'Uneven groups'; vClass = 'bad'; }
+
+    var summary = '<div class="rrb-summary"><div class="rrb-summary-grid">' +
+      metric('Groups', groupCount) +
+      metric('Teams / group', describeSizes(groups)) +
+      metric('Group avg spread', gSpread + ' <small>Elo SD</small>') +
+      metric('Highest vs lowest', avgRange + ' <small>Elo</small>') +
+      metric('Biggest matchup gap', globalMaxGap + ' <small>Elo</small>') +
+      '</div><div class="rrb-balance-badge ' + vClass + '">' + balanceIcon(vClass) + verdict + ' across groups</div></div>';
+
+    var groupsHtml = '<div class="rrb-groups">';
+    groups.forEach(function (g, gi) {
+      var s = groupStats[gi];
+      var sortedG = g.slice().sort(function (a, b) { return b.elo - a.elo; });
+      var head = '<div class="rrb-group-head"><span class="gname">Group ' + letter(gi) + '</span><span class="gavg">\u00d8 ' + s.avg + '</span></div>';
+      var statline = '<div class="rrb-group-stats">' +
+        '<span>min <b>' + s.min + '</b></span>' +
+        '<span>max <b>' + s.max + '</b></span>' +
+        '<span>range <b>' + s.range + '</b></span>' +
+        '<span>SD <b>' + s.sd + '</b></span></div>';
+      var teamsHtml = '<div class="rrb-group-teams">';
+      sortedG.forEach(function (t, ti) {
+        teamsHtml += '<div class="rrb-gt"><span class="seed">' + (ti + 1) + '</span><span class="nm">' + esc(t.name) + '</span><span class="el">' + t.elo + '</span>' + moveSelect(t, gi) + '</div>';
+      });
+      teamsHtml += '</div>';
+
+      var gaps = pairGaps(g);
+      var gapsHtml = '';
+      if (gaps.length) {
+        gapsHtml = '<div class="rrb-gaps"><div class="gaps-h">Per-matchup Elo gaps (' + gaps.length + ' games)</div>';
+        gaps.forEach(function (p) {
+          var w = globalMaxGap ? Math.round(p.gap / globalMaxGap * 100) : 0;
+          gapsHtml += '<div class="rrb-gap-row"><span class="pair">' + esc(shortName(p.a.name)) + ' v ' + esc(shortName(p.b.name)) +
+            '</span><span class="rrb-gap-bar-track"><span class="rrb-gap-bar" style="width:' + w + '%;background:' + gapColor(p.gap, globalMaxGap) + '"></span></span><span class="gv">' + p.gap + '</span></div>';
+        });
+        gapsHtml += '</div>';
+      }
+
+      groupsHtml += '<div class="rrb-group">' + head + statline + teamsHtml + gapsHtml + '</div>';
+    });
+    groupsHtml += '</div>';
+
+    out.innerHTML = summary + groupsHtml;
+    bindMoves();
+  }
+
+  function describeSizes(gs) {
+    var sizes = gs.map(function (g) { return g.length; });
+    var mn = Math.min.apply(null, sizes), mx = Math.max.apply(null, sizes);
+    return mn === mx ? String(mn) : mn + '\u2013' + mx;
+  }
+
+  function metric(k, v) { return '<div class="rrb-metric"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
+  function balanceIcon(c) {
+    if (c === 'good') return '<span style="font-size:14px">\u2713</span>';
+    if (c === 'warn') return '<span style="font-size:14px">\u25CB</span>';
+    return '<span style="font-size:14px">!</span>';
+  }
+
+  function moveSelect(team, fromGi) {
+    var opts = '<option value="">move\u2026</option>';
+    for (var i = 0; i < groupCount; i++) {
+      if (i === fromGi) continue;
+      opts += '<option value="' + i + '">\u2192 ' + letter(i) + '</option>';
+    }
+    return '<select data-team="' + team.id + '" data-from="' + fromGi + '">' + opts + '</select>';
+  }
+
+  function bindMoves() {
+    document.querySelectorAll('.rrb-gt select').forEach(function (sel) {
+      sel.addEventListener('change', function () {
+        var to = this.value;
+        if (to === '') return;
+        var tid = +this.getAttribute('data-team');
+        var from = +this.getAttribute('data-from');
+        var idx = groups[from].findIndex(function (t) { return t.id === tid; });
+        if (idx === -1) return;
+        var moved = groups[from].splice(idx, 1)[0];
+        groups[+to].push(moved);
+        render();
+      });
+    });
+  }
+
+  function renderTeamList() {
+    var el = document.getElementById('rrb-teamlist');
+    if (!teams.length) { el.innerHTML = '<div style="font-size:12.5px;color:var(--text-dim);padding:10px 4px">No teams yet.</div>'; return; }
+    var sorted = teams.slice().sort(function (a, b) { return b.elo - a.elo; });
+    el.innerHTML = sorted.map(function (t) {
+      return '<div class="rrb-team-item"><span class="nm">' + esc(t.name) + '</span><span class="el">' + t.elo + '</span><button class="rm" data-id="' + t.id + '" aria-label="Remove">\u00d7</button></div>';
+    }).join('');
+    el.querySelectorAll('.rm').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = +this.getAttribute('data-id');
+        teams = teams.filter(function (t) { return t.id !== id; });
+        groups = [];
+        render();
+      });
+    });
+  }
+
+  var nextId = 1;
+  function addTeam(name, elo) {
+    name = (name || '').trim();
+    elo = parseInt(elo, 10);
+    if (!name || isNaN(elo)) return false;
+    teams.push({ id: nextId++, name: name, elo: elo });
+    groups = [];
+    return true;
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function shortName(s) { return s.length > 8 ? s.slice(0, 7) + '\u2026' : s; }
+
+  document.getElementById('rrb-add').addEventListener('click', function () {
+    if (addTeam(document.getElementById('rrb-name').value, document.getElementById('rrb-elo').value)) {
+      document.getElementById('rrb-name').value = '';
+      document.getElementById('rrb-elo').value = '';
+      document.getElementById('rrb-name').focus();
+      render();
+    }
+  });
+  document.getElementById('rrb-elo').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('rrb-add').click(); });
+  document.getElementById('rrb-name').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('rrb-elo').focus(); });
+
+  document.getElementById('rrb-paste-btn').addEventListener('click', function () {
+    var lines = document.getElementById('rrb-paste').value.split('\n');
+    var added = 0;
+    lines.forEach(function (line) {
+      if (!line.trim()) return;
+      var parts = line.split(/[,;\t]/);
+      if (parts.length >= 2) {
+        var name = parts[0];
+        var elo = parts[parts.length - 1].replace(/[^0-9]/g, '');
+        if (addTeam(name, elo)) added++;
+      }
+    });
+    if (added) { document.getElementById('rrb-paste').value = ''; render(); }
+  });
+
+  document.getElementById('rrb-sample').addEventListener('click', function () {
+    var sample = [['Aurora', 2400], ['Nimbus', 2310], ['Vortex', 2180], ['Phantom', 2050], ['Eclipse', 1990], ['Tempest', 1875], ['Cipher', 1820], ['Onyx', 1760], ['Radiant', 1700], ['Zephyr', 1650], ['Hollow', 1590], ['Specter', 1520], ['Glacier', 1480], ['Ember', 1410], ['Drift', 1350], ['Static', 1200]];
+    sample.forEach(function (s) { addTeam(s[0], s[1]); });
+    render();
+  });
+
+  document.getElementById('rrb-clear').addEventListener('click', function () {
+    teams = []; groups = []; render();
+  });
+
+  document.getElementById('rrb-groups-n').addEventListener('input', function () {
+    var v = parseInt(this.value, 10);
+    if (!isNaN(v) && v >= 2 && v <= 16) { groupCount = v; groups = []; render(); }
+  });
+
+  document.getElementById('rrb-balance').addEventListener('click', function () {
+    if (teams.length >= groupCount) { snakeDraft(); render(); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
