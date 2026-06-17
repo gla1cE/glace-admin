@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swiss Tournament Format Builder</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --line: #2a2f3a;
+    --line-soft: #222631;
+    --text: #e8eaed;
+    --text-dim: #9aa1ad;
+    --accent: #5b8cff;
+    --accent-bg: rgba(91, 140, 255, 0.12);
+    --accent-line: rgba(91, 140, 255, 0.5);
+    --success: #4ec98a;
+    --success-bg: rgba(78, 201, 138, 0.14);
+    --warn: #e6b450;
+    --warn-bg: rgba(230, 180, 80, 0.14);
+    --danger: #f0726b;
+    --danger-bg: rgba(240, 114, 107, 0.14);
+    --radius: 10px;
+    --radius-sm: 7px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  .stb-root {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 24px 36px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .stb-root h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+  }
+  .stb-root .stb-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 0 0 24px;
+  }
+
+  .stb-grid {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .stb-grid.two { grid-template-columns: 1fr 1fr; }
+
+  .stb-root label {
+    font-size: 13px;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .stb-root label b { color: var(--text); font-weight: 600; }
+
+  .stb-root input[type="number"] {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font: inherit;
+    font-size: 15px;
+    padding: 9px 11px;
+    border-radius: var(--radius-sm);
+    outline: none;
+  }
+  .stb-root input[type="number"]:focus {
+    border-color: var(--accent-line);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+
+  .stb-root input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--line);
+    border-radius: 3px;
+    outline: none;
+    margin: 12px 0 4px;
+  }
+  .stb-root input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--accent-line);
+  }
+  .stb-root input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--accent-line);
+  }
+
+  .stb-box {
+    border-radius: var(--radius);
+    padding: 12px 15px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    display: none;
+  }
+  .stb-box .ico { font-style: normal; font-weight: 700; margin-right: 7px; }
+  .stb-box.info { background: var(--accent-bg); color: #aec1ff; }
+  .stb-box.success { background: var(--success-bg); color: #8fe3b6; }
+  .stb-box.warn { background: var(--warn-bg); color: #f1d28a; }
+  .stb-box.danger { background: var(--danger-bg); color: #f6a8a3; }
+
+  .stb-summary {
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .stb-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .stb-card {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 15px 18px;
+  }
+  .stb-card.accent { border: 1.5px solid var(--accent-line); }
+  .stb-card .stb-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stb-card .stb-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--panel-2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px;
+  }
+  .stb-card .stb-title { font-weight: 600; font-size: 16px; }
+  .stb-card .stb-row {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 6px 0; font-size: 14px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .stb-card .stb-row .k { color: var(--text-dim); }
+  .stb-card .stb-row .v { font-weight: 600; text-align: right; }
+
+  .stb-label {
+    font-size: 13px; color: var(--text-dim); margin-bottom: 10px;
+  }
+  .stb-standings { display: flex; flex-direction: column; gap: 6px; }
+  .stb-stand-row { display: flex; align-items: center; gap: 10px; }
+  .stb-stand-row .rec { font-size: 13px; font-weight: 600; min-width: 42px; }
+  .stb-bar-track {
+    flex: 1; background: var(--panel-2); border-radius: 4px;
+    height: 22px; position: relative; overflow: hidden;
+  }
+  .stb-bar-fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    border-radius: 4px; opacity: 0.85;
+  }
+  .stb-stand-row .cnt { font-size: 13px; font-weight: 600; min-width: 36px; text-align: right; }
+  .stb-tag {
+    min-width: 74px; text-align: right;
+  }
+  .stb-tag span {
+    font-size: 11px; padding: 1px 7px; border-radius: 6px;
+  }
+  .stb-tag .q { color: #8fe3b6; background: var(--success-bg); }
+  .stb-tag .o { color: var(--text-dim); background: var(--panel-2); }
+
+  @media (max-width: 520px) {
+    .stb-grid.two { grid-template-columns: 1fr; }
+    .stb-root { padding: 20px 16px 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="stb-root">
+  <h1>Swiss Tournament Format Builder</h1>
+  <p class="stb-sub">Set your field, paid places, and cutoffs. The plan and final standings update live.</p>
+
+  <div class="stb-grid two">
+    <div>
+      <label for="stb-teams">Teams participating</label>
+      <input type="number" id="stb-teams" value="32" min="2" max="1024" step="1">
+    </div>
+    <div>
+      <label for="stb-paid">Paid places</label>
+      <input type="number" id="stb-paid" value="16" min="1" max="512" step="1">
+    </div>
+  </div>
+
+  <div class="stb-grid two">
+    <div>
+      <label for="stb-wincut">Qualify at: <b id="stb-wc-out">3</b> wins</label>
+      <input type="range" id="stb-wincut" min="1" max="6" value="3" step="1">
+    </div>
+    <div>
+      <label for="stb-losscut">Eliminate at: <b id="stb-lc-out">3</b> losses</label>
+      <input type="range" id="stb-losscut" min="1" max="6" value="3" step="1">
+    </div>
+  </div>
+
+  <div class="stb-box" id="stb-warn"></div>
+  <div class="stb-summary" id="stb-summary"></div>
+  <div class="stb-stages" id="stb-stages"></div>
+
+  <div class="stb-label">Final Swiss standings — teams at each record</div>
+  <div class="stb-standings" id="stb-standings"></div>
+</div>
+
+<script>
+(function () {
+  function ceilLog2(n) { return Math.ceil(Math.log2(Math.max(2, n))); }
+
+  function swissSim(teams, winCut, lossCut) {
+    var groups = { '0-0': teams };
+    var qByRec = {}, eByRec = {}, qTotal = 0, eTotal = 0, rounds = 0;
+    for (var iter = 0; iter < 120; iter++) {
+      var nxt = {}, played = false;
+      for (var key in groups) {
+        var p = key.split('-'); var w = +p[0], l = +p[1]; var c = groups[key];
+        if (c <= 0) continue;
+        played = true;
+        var win = Math.floor(c / 2), lose = c - win;
+        var ww = w + 1, ll = l + 1;
+        if (ww >= winCut) { qByRec[ww + '-' + l] = (qByRec[ww + '-' + l] || 0) + win; qTotal += win; }
+        else nxt[ww + '-' + l] = (nxt[ww + '-' + l] || 0) + win;
+        if (ll >= lossCut) { eByRec[w + '-' + ll] = (eByRec[w + '-' + ll] || 0) + lose; eTotal += lose; }
+        else nxt[w + '-' + ll] = (nxt[w + '-' + ll] || 0) + lose;
+      }
+      if (played) rounds++;
+      groups = {}; var any = false;
+      for (var k in nxt) { if (nxt[k] > 0) { groups[k] = nxt[k]; any = true; } }
+      if (!any) break;
+    }
+    return { qTotal: qTotal, eTotal: eTotal, rounds: rounds, qByRec: qByRec, eByRec: eByRec };
+  }
+
+  function boundaries(teams, winCut, lossCut) {
+    var s = swissSim(teams, winCut, lossCut);
+    var recs = Object.keys(s.qByRec).sort(function (a, b) { return (+a.split('-')[1]) - (+b.split('-')[1]); });
+    var cum = 0, list = [{ n: 1, label: 'champion' }];
+    recs.forEach(function (r) { cum += s.qByRec[r]; list.push({ n: cum, label: 'down to ' + r.replace('-', 'W ') + 'L' }); });
+    var seen = {}, out = [];
+    list.forEach(function (o) { if (!seen[o.n]) { seen[o.n] = 1; out.push(o); } });
+    return { list: out, qual: s.qTotal };
+  }
+
+  function swissMatchCount(teams, rounds) { return Math.max(0, Math.round(teams * rounds / 2 - rounds)); }
+
+  function stageCard(num, title, lines, accent) {
+    var rows = lines.map(function (l) {
+      return '<div class="stb-row"><span class="k">' + l[0] + '</span><span class="v">' + l[1] + '</span></div>';
+    }).join('');
+    return '<div class="stb-card' + (accent ? ' accent' : '') + '">'
+      + '<div class="stb-head"><div class="stb-num">' + num + '</div><div class="stb-title">' + title + '</div></div>'
+      + rows + '</div>';
+  }
+
+  function setBox(el, type, html) {
+    el.className = 'stb-box ' + type;
+    el.innerHTML = html;
+    el.style.display = 'block';
+  }
+
+  function renderStandings(s) {
+    var rows = [];
+    Object.keys(s.qByRec).forEach(function (r) { rows.push({ rec: r, n: s.qByRec[r], qualified: true }); });
+    Object.keys(s.eByRec).forEach(function (r) { rows.push({ rec: r, n: s.eByRec[r], qualified: false }); });
+    rows.sort(function (a, b) {
+      var aw = +a.rec.split('-')[0], al = +a.rec.split('-')[1];
+      var bw = +b.rec.split('-')[0], bl = +b.rec.split('-')[1];
+      if (bw !== aw) return bw - aw; return al - bl;
+    });
+    var max = 0; rows.forEach(function (r) { if (r.n > max) max = r.n; });
+    var el = document.getElementById('stb-standings'); el.innerHTML = '';
+    if (!rows.length) { el.innerHTML = '<div style="font-size:13px;color:var(--text-dim)">No completed records for these cutoffs.</div>'; return; }
+    rows.forEach(function (r) {
+      var pct = max ? Math.round(r.n / max * 100) : 0;
+      var col = r.qualified ? 'var(--success)' : 'var(--text-dim)';
+      var tag = r.qualified
+        ? '<span class="q">qualified</span>'
+        : '<span class="o">out</span>';
+      el.innerHTML += '<div class="stb-stand-row">'
+        + '<span class="rec">' + r.rec + '</span>'
+        + '<div class="stb-bar-track"><div class="stb-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>'
+        + '<span class="cnt">' + r.n + '</span>'
+        + '<span class="stb-tag">' + tag + '</span></div>';
+    });
+  }
+
+  function compute() {
+    var teams = Math.max(2, Math.round(+document.getElementById('stb-teams').value || 0));
+    var paid = Math.max(1, Math.round(+document.getElementById('stb-paid').value || 0));
+    var winCut = +document.getElementById('stb-wincut').value;
+    var lossCut = +document.getElementById('stb-losscut').value;
+    document.getElementById('stb-wc-out').textContent = winCut;
+    document.getElementById('stb-lc-out').textContent = lossCut;
+    if (paid > teams) { paid = teams; document.getElementById('stb-paid').value = paid; }
+
+    var warn = document.getElementById('stb-warn');
+    var summary = document.getElementById('stb-summary');
+    var stages = document.getElementById('stb-stages');
+    warn.style.display = 'none';
+
+    var s = swissSim(teams, winCut, lossCut);
+    renderStandings(s);
+
+    var b = boundaries(teams, winCut, lossCut);
+    var qualMax = b.qual;
+    var bset = {}; b.list.forEach(function (o) { bset[o.n] = o.label; });
+    var totalRounds = s.rounds;
+
+    if (paid === 1) {
+      summary.style.background = 'var(--accent-bg)'; summary.style.color = '#aec1ff';
+      summary.innerHTML = '<span class="ico">★</span>Swiss only — runs to a single champion.';
+      stages.innerHTML = stageCard('1', 'Swiss stage', [
+        ['Format', 'qualify ' + winCut + 'W, eliminate ' + lossCut + 'L'],
+        ['Rounds', totalRounds + ' rounds'],
+        ['Result', 'top of standings = winner'],
+        ['Total Swiss matches', '~' + swissMatchCount(teams, totalRounds)]
+      ], true);
+      return;
+    }
+
+    if (paid <= qualMax && bset[paid]) {
+      summary.style.background = 'var(--success-bg)'; summary.style.color = '#8fe3b6';
+      summary.innerHTML = '<span class="ico">✓</span>Swiss only — paying ' + paid + ' lands on a natural cutoff (' + bset[paid] + ').';
+      stages.innerHTML = stageCard('1', 'Swiss stage', [
+        ['Format', 'qualify ' + winCut + 'W, eliminate ' + lossCut + 'L'],
+        ['Rounds', totalRounds + ' rounds'],
+        ['Teams paid', paid + ' (' + bset[paid] + ')'],
+        ['Everyone else', 'eliminated in Swiss'],
+        ['Total Swiss matches', '~' + swissMatchCount(teams, totalRounds)]
+      ], true);
+      setBox(warn, 'info', '<span class="ico">i</span>These ' + paid + ' teams share the tier equally. To rank them 1st–' + paid + ' individually, add a bracket.');
+      return;
+    }
+
+    if (paid <= qualMax && !bset[paid]) {
+      var hi = null; b.list.forEach(function (o) { if (o.n >= paid && hi === null) hi = o.n; });
+      var qual = hi || qualMax;
+      var poRounds = ceilLog2(qual);
+      var place = paid <= 2 ? 0 : paid <= 4 ? 1 : paid <= 6 ? 3 : poRounds;
+      summary.style.background = 'var(--accent-bg)'; summary.style.color = '#aec1ff';
+      summary.innerHTML = '<span class="ico">≡</span>Swiss qualifies ' + qual + ', then a small bracket ranks your top ' + paid + '.';
+      stages.innerHTML = stageCard('1', 'Swiss stage', [
+        ['Format', 'qualify ' + winCut + 'W, eliminate ' + lossCut + 'L'],
+        ['Rounds', totalRounds + ' rounds'],
+        ['Qualifies', qual + ' teams'],
+        ['Total Swiss matches', '~' + swissMatchCount(teams, totalRounds)]
+      ], false)
+        + stageCard('2', 'Placement bracket', [
+          ['Teams', qual + '-team single elim'],
+          ['Placement matches', place === 0 ? 'none' : '+' + place],
+          ['Total bracket matches', (qual - 1) + place],
+          ['Decides', 'clean 1st–' + paid]
+        ], true);
+      return;
+    }
+
+    var opts = b.list.filter(function (o) { return o.n <= teams; }).map(function (o) { return o.n; });
+    var below = null, above = null;
+    opts.forEach(function (n) { if (n < paid) below = n; });
+    for (var i = 0; i < opts.length; i++) { if (opts[i] > paid) { above = opts[i]; break; } }
+    summary.style.background = 'var(--danger-bg)'; summary.style.color = '#f6a8a3';
+    summary.innerHTML = '<span class="ico">!</span>Paying ' + paid + ' is not reachable: qualify ' + winCut + 'W / eliminate ' + lossCut + 'L on ' + teams + ' teams advances only ' + qualMax + '.';
+    var msg = '<span class="ico">»</span>Valid paid counts at these cutoffs: ' + opts.slice(0, 10).join(', ') + '.';
+    if (below || above) {
+      msg += '<br><span style="display:inline-block;margin-top:6px">Nearest to ' + paid + ': '
+        + (below ? '<b>' + below + '</b>' : '') + (below && above ? ' or ' : '') + (above ? '<b>' + above + '</b>' : '') + '.</span>';
+    }
+    msg += '<br><span style="display:inline-block;margin-top:6px">To advance more teams, raise the loss cutoff (e.g. eliminate at ' + (lossCut + 1) + 'L) so fewer teams are knocked out.</span>';
+    setBox(warn, 'warn', msg);
+    stages.innerHTML = '';
+  }
+
+  ['stb-teams', 'stb-paid', 'stb-wincut', 'stb-losscut'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', compute);
+  });
+  compute();
+})();
+</script>
+</body>
+</html>
