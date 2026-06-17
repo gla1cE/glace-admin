@@ -984,6 +984,28 @@ section {
   width: 100%;
 }
 
+.footer-tools {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.footer-tool-btn {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 10px;
+  transition: color 0.3s, border-color 0.3s;
+  white-space: nowrap;
+}
+
+.footer-tool-btn:hover {
+  color: var(--turquoise);
+  border-color: var(--turquoise);
+}
+
 .footer-social {
   display: flex;
   gap: 0.6rem;
