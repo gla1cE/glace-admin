@@ -128,6 +128,13 @@
   .seb-note { font-size: 12.5px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
 
   .seb-foot { font-size: 12px; color: var(--text-dim); margin-top: 24px; line-height: 1.6; }
+  .seb-nm-input { background: none; border: none; color: var(--text); font-family: var(--mono); font-size: 12.5px; flex: 1; min-width: 0; outline: none; padding: 0; opacity: 0.6; }
+  .seb-nm-input:hover { opacity: 0.85; }
+  .seb-nm-input:focus { opacity: 1; }
+  .seb-nm-input::placeholder { color: var(--text-dim); opacity: 0.5; font-style: italic; }
+  .seb .seb-upload-btn { display: inline-flex; align-items: center; background: var(--accent-bg); border: 1px solid var(--accent-line); color: #aec1ff; font: inherit; font-size: 12px; padding: 4px 12px; border-radius: 6px 0 0 6px; border-right: none; cursor: pointer; white-space: nowrap; margin-bottom: 0; }
+  .seb .seb-upload-btn:hover { background: rgba(91,140,255,0.2); }
+  .seb-copy { border-radius: 0 6px 6px 0; }
   .calc-nav { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .calc-nav-btn { font-size: 12px; color: var(--text-dim); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; text-decoration: none; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
   .calc-nav-btn:hover { color: var(--accent); border-color: var(--accent-line); }
@@ -162,7 +169,10 @@
     <div class="seb-list-card">
       <div class="seb-list-head">
         <span class="t">Seeding order for FACEIT</span>
-        <button class="seb-copy" id="seb-copy">Copy list</button>
+        <div style="display:inline-flex;">
+          <label class="seb-upload-btn">Upload<input type="file" id="seb-upload" accept=".txt" style="display:none"></label>
+          <button class="seb-copy" id="seb-copy">Copy list</button>
+        </div>
       </div>
       <div class="seb-seedlist" id="seb-seedlist"></div>
       <div class="seb-note">Arrange teams in your FACEIT participant list in this exact order before generating the bracket. Seed 1 is your strongest team.</div>
@@ -181,6 +191,17 @@
 
 <script>
 (function () {
+  var teamNames = [];
+  var currentN = 16;
+  var lastByeSet = {};
+
+  function teamName(seed) {
+    return (teamNames[seed] && teamNames[seed].trim()) || 'Team ' + seed;
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function bracketSeedOrder(size) {
     var rounds = Math.log2(size);
     var seeds = [1, 2];
@@ -216,21 +237,21 @@
     if (isBye) {
       return '<div class="seb-slot bye"><span class="seb-seed">BYE</span><span class="seb-team">advances seed</span></div>';
     }
-    return '<div class="seb-slot"><span class="seb-seed">' + seed + '</span><span class="seb-team">Team ' + seed + '</span></div>';
+    return '<div class="seb-slot" data-seed="' + seed + '"><span class="seb-seed">' + seed + '</span><span class="seb-team">' + esc(teamName(seed)) + '</span></div>';
   }
 
   function advSlot(seed) {
     if (typeof seed === 'number') {
-      return '<div class="seb-slot seeded-adv"><span class="seb-seed">' + seed + '</span><span class="seb-team">Team ' + seed + '</span></div>';
+      return '<div class="seb-slot seeded-adv" data-seed="' + seed + '"><span class="seb-seed">' + seed + '</span><span class="seb-team">' + esc(teamName(seed)) + '</span></div>';
     }
     return '<div class="seb-slot"><span class="seb-seed">\u2013</span><span class="seb-team">Winner</span></div>';
   }
 
   function render(n) {
+    currentN = n;
     var data = build(n);
     var totalRounds = Math.log2(data.size);
 
-    // stats
     var totalMatches = data.size - 1;
     var realR1 = 0;
     for (var i = 0; i < data.slots.length; i += 2) {
@@ -243,11 +264,6 @@
       stat('Round 1 matches', realR1) +
       stat('Byes', data.byes);
 
-    // build round 1 pairs
-    // slot values: a seed number (known team), 'BYE' (empty bye slot, no opponent),
-    // or 'TBD' (winner of a real match, not yet known).
-    // Only a real round-1 bye (seed vs empty BYE slot) resolves to a known advancer;
-    // a known seed facing a TBD opponent has NOT played yet, so its winner is TBD.
     function winnerOf(match) {
       var a = match[0], b = match[1];
       if (typeof a === 'number' && b === 'BYE') return a;
@@ -262,7 +278,6 @@
       r1.push([top, bot]);
     }
 
-    // build every round, propagating only known bye advancers (one round forward)
     var allRounds = [r1];
     var cur = r1;
     while (cur.length > 1) {
@@ -274,7 +289,6 @@
       cur = nxt;
     }
 
-    // render columns
     var cols = [];
     for (var r = 0; r < allRounds.length; r++) {
       var roundMatches = allRounds[r];
@@ -301,20 +315,20 @@
     }
     document.getElementById('seb-bracket').innerHTML = cols.join('');
 
-    // seeding list
     var listHtml = '';
     var byeSet = {};
     r1.forEach(function (p) {
       if (p[0] === null && p[1] !== null) byeSet[p[1]] = true;
       if (p[1] === null && p[0] !== null) byeSet[p[0]] = true;
     });
+    lastByeSet = byeSet;
     for (var s = 1; s <= n; s++) {
-      listHtml += '<div class="seb-seedrow"><span class="n">#' + s + '</span><span class="nm">Team ' + s + '</span>' +
+      listHtml += '<div class="seb-seedrow"><span class="n">#' + s + '</span>' +
+        '<input class="seb-nm-input" data-seed="' + s + '" value="' + esc(teamName(s)) + '" placeholder="Team ' + s + '">' +
         (byeSet[s] ? '<span class="tag">bye</span>' : '') + '</div>';
     }
     document.getElementById('seb-seedlist').innerHTML = listHtml;
 
-    // byes
     var byeSeeds = Object.keys(byeSet).map(Number).sort(function (a, b) { return a - b; });
     var byeEl = document.getElementById('seb-byes');
     var byeNote = document.getElementById('seb-bye-note');
@@ -328,7 +342,7 @@
 
     window.__seedList = (function () {
       var lines = [];
-      for (var s = 1; s <= n; s++) lines.push(s + '. Team ' + s + (byeSet[s] ? '  (bye)' : ''));
+      for (var s = 1; s <= n; s++) lines.push(s + '. ' + teamName(s) + (byeSet[s] ? '  (bye)' : ''));
       return lines.join('\n');
     })();
   }
@@ -355,9 +369,45 @@
     navigator.clipboard.writeText(window.__seedList || '').then(function () {
       btn.textContent = 'Copied';
       setTimeout(function () { btn.textContent = 'Copy list'; }, 1400);
-    }).catch(function () {
-      btn.textContent = 'Press Ctrl+C';
+    }).catch(function () { btn.textContent = 'Press Ctrl+C'; });
+  });
+
+  document.getElementById('seb-seedlist').addEventListener('input', function (e) {
+    if (!e.target.matches('input[data-seed]')) return;
+    var seed = +e.target.getAttribute('data-seed');
+    teamNames[seed] = e.target.value;
+    var name = teamName(seed);
+    document.querySelectorAll('#seb-bracket .seb-slot[data-seed="' + seed + '"] .seb-team').forEach(function (el) {
+      el.textContent = name;
     });
+    var lines = [];
+    for (var s = 1; s <= currentN; s++) lines.push(s + '. ' + teamName(s) + (lastByeSet[s] ? '  (bye)' : ''));
+    window.__seedList = lines.join('\n');
+  });
+
+  document.getElementById('seb-upload').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var lines = ev.target.result.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+      lines.forEach(function (line, i) { teamNames[i + 1] = line; });
+      for (var s = 1; s <= currentN; s++) {
+        (function (seed) {
+          var inp = document.querySelector('#seb-seedlist input[data-seed="' + seed + '"]');
+          if (inp) inp.value = teamName(seed);
+          var name = teamName(seed);
+          document.querySelectorAll('#seb-bracket .seb-slot[data-seed="' + seed + '"] .seb-team').forEach(function (el) {
+            el.textContent = name;
+          });
+        })(s);
+      }
+      var copyLines = [];
+      for (var ss = 1; ss <= currentN; ss++) copyLines.push(ss + '. ' + teamName(ss) + (lastByeSet[ss] ? '  (bye)' : ''));
+      window.__seedList = copyLines.join('\n');
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   });
 
   update();

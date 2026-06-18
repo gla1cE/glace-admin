@@ -145,6 +145,13 @@
   .deb-bye-warn { background: var(--bye-bg); border: 1px solid var(--bye); border-radius: var(--radius); padding: 11px 15px; font-size: 13px; color: #f1d28a; margin-bottom: 22px; display: none; }
   .deb-bye-warn b { font-weight: 600; }
   .deb-foot { font-size: 12px; color: var(--text-dim); margin-top: 4px; line-height: 1.6; }
+  .deb-nm-input { background: none; border: none; color: var(--text); font-family: var(--mono); font-size: 12.5px; flex: 1; min-width: 0; outline: none; padding: 0; opacity: 0.6; }
+  .deb-nm-input:hover { opacity: 0.85; }
+  .deb-nm-input:focus { opacity: 1; }
+  .deb-nm-input::placeholder { color: var(--text-dim); opacity: 0.5; font-style: italic; }
+  .deb .deb-upload-btn { display: inline-flex; align-items: center; background: var(--wb-bg); border: 1px solid var(--wb-line); color: #aec1ff; font: inherit; font-size: 12px; padding: 4px 12px; border-radius: 6px 0 0 6px; border-right: none; cursor: pointer; white-space: nowrap; margin-bottom: 0; }
+  .deb .deb-upload-btn:hover { background: rgba(91,140,255,0.2); }
+  .deb-copy { border-radius: 0 6px 6px 0; }
   .calc-nav { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .calc-nav-btn { font-size: 12px; color: var(--text-dim); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; text-decoration: none; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
   .calc-nav-btn:hover { color: var(--wb); border-color: var(--wb-line); }
@@ -200,7 +207,13 @@
 
   <div class="deb-two">
     <div class="deb-card">
-      <div class="deb-card-head"><span class="t">Seeding order for FACEIT</span><button class="deb-copy" id="deb-copy">Copy list</button></div>
+      <div class="deb-card-head">
+        <span class="t">Seeding order for FACEIT</span>
+        <div style="display:inline-flex;">
+          <label class="deb-upload-btn">Upload<input type="file" id="deb-upload" accept=".txt" style="display:none"></label>
+          <button class="deb-copy" id="deb-copy">Copy list</button>
+        </div>
+      </div>
       <div class="deb-seedlist" id="deb-seedlist"></div>
       <div class="deb-note">Arrange teams in your FACEIT participant list in this order before generating. Seed 1 is strongest. Winners-bracket seeding drives the whole structure.</div>
     </div>
@@ -215,6 +228,18 @@
 
 <script>
 (function () {
+  var teamNames = [];
+  var currentN = 16;
+  var lastByeSet = {};
+  var resetOn = true;
+
+  function teamName(seed) {
+    return (teamNames[seed] && teamNames[seed].trim()) || 'Team ' + seed;
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function bracketSeedOrder(size) {
     var rounds = Math.log2(size); var seeds = [1, 2];
     for (var r = 0; r < rounds - 1; r++) {
@@ -272,7 +297,7 @@
     if (v === 'TBD') return '<div class="deb-slot"><span class="deb-seed">\u2013</span><span class="deb-team">Winner</span></div>';
     if (typeof v === 'number') {
       var cls = kind === 'r1' ? '' : 'seeded';
-      return '<div class="deb-slot ' + cls + '"><span class="deb-seed">' + v + '</span><span class="deb-team">Team ' + v + '</span></div>';
+      return '<div class="deb-slot ' + cls + '" data-seed="' + v + '"><span class="deb-seed">' + v + '</span><span class="deb-team">' + esc(teamName(v)) + '</span></div>';
     }
     return '<div class="deb-slot"><span class="deb-seed">\u2013</span><span class="deb-team">Winner</span></div>';
   }
@@ -283,14 +308,13 @@
   }
 
   function render(n, reset) {
+    currentN = n;
     var d = build(n);
     var totalRounds = Math.log2(d.size);
     var wbMatches = d.size - 1;
     var lbMatches = d.LB.reduce(function (a, r) { return a + r.matches; }, 0);
     var gfMatches = reset ? 2 : 1;
     var totalMax = wbMatches + lbMatches + gfMatches;
-
-    var realR1 = d.WB[0].filter(function (m) { return m[0] !== 'BYE' && m[1] !== 'BYE'; }).length;
 
     document.getElementById('deb-stats').innerHTML =
       stat('Bracket size', d.size) +
@@ -348,9 +372,13 @@
       if (p[0] === 'BYE' && p[1] !== 'BYE') byeSet[p[1]] = true;
       if (p[1] === 'BYE' && p[0] !== 'BYE') byeSet[p[0]] = true;
     });
+    lastByeSet = byeSet;
+
     var listHtml = '';
     for (var s = 1; s <= n; s++) {
-      listHtml += '<div class="deb-seedrow"><span class="n">#' + s + '</span><span class="nm">Team ' + s + '</span>' + (byeSet[s] ? '<span class="tag">bye</span>' : '') + '</div>';
+      listHtml += '<div class="deb-seedrow"><span class="n">#' + s + '</span>' +
+        '<input class="deb-nm-input" data-seed="' + s + '" value="' + esc(teamName(s)) + '" placeholder="Team ' + s + '">' +
+        (byeSet[s] ? '<span class="tag">bye</span>' : '') + '</div>';
     }
     document.getElementById('deb-seedlist').innerHTML = listHtml;
 
@@ -377,7 +405,7 @@
 
     window.__seedList = (function () {
       var lines = [];
-      for (var s2 = 1; s2 <= n; s2++) lines.push(s2 + '. Team ' + s2 + (byeSet[s2] ? '  (bye)' : ''));
+      for (var s2 = 1; s2 <= n; s2++) lines.push(s2 + '. ' + teamName(s2) + (byeSet[s2] ? '  (bye)' : ''));
       return lines.join('\n');
     })();
   }
@@ -387,7 +415,6 @@
 
   var slider = document.getElementById('deb-teams');
   var out = document.getElementById('deb-teams-out');
-  var resetOn = true;
   function update() { out.textContent = slider.value; render(+slider.value, resetOn); }
   slider.addEventListener('input', update);
 
@@ -407,6 +434,44 @@
     navigator.clipboard.writeText(window.__seedList || '').then(function () {
       btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy list'; }, 1400);
     }).catch(function () { btn.textContent = 'Press Ctrl+C'; });
+  });
+
+  document.getElementById('deb-seedlist').addEventListener('input', function (e) {
+    if (!e.target.matches('input[data-seed]')) return;
+    var seed = +e.target.getAttribute('data-seed');
+    teamNames[seed] = e.target.value;
+    var name = teamName(seed);
+    document.querySelectorAll('#deb-wb .deb-slot[data-seed="' + seed + '"] .deb-team').forEach(function (el) {
+      el.textContent = name;
+    });
+    var lines = [];
+    for (var s = 1; s <= currentN; s++) lines.push(s + '. ' + teamName(s) + (lastByeSet[s] ? '  (bye)' : ''));
+    window.__seedList = lines.join('\n');
+  });
+
+  document.getElementById('deb-upload').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var lines = ev.target.result.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+      lines.forEach(function (line, i) { teamNames[i + 1] = line; });
+      for (var s = 1; s <= currentN; s++) {
+        (function (seed) {
+          var inp = document.querySelector('#deb-seedlist input[data-seed="' + seed + '"]');
+          if (inp) inp.value = teamName(seed);
+          var name = teamName(seed);
+          document.querySelectorAll('#deb-wb .deb-slot[data-seed="' + seed + '"] .deb-team').forEach(function (el) {
+            el.textContent = name;
+          });
+        })(s);
+      }
+      var copyLines = [];
+      for (var ss = 1; ss <= currentN; ss++) copyLines.push(ss + '. ' + teamName(ss) + (lastByeSet[ss] ? '  (bye)' : ''));
+      window.__seedList = copyLines.join('\n');
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   });
 
   update();

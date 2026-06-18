@@ -58,7 +58,9 @@
   .rrb-btn.ghost:hover { color: var(--text); border-color: var(--accent-line); }
 
   .rrb-divider { height: 1px; background: var(--line-soft); margin: 16px 0; }
-  .rrb-paste-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .rrb-paste-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+  .rrb-btn.danger { background: var(--panel-2); border-color: rgba(240, 114, 107, 0.35); color: var(--bad); }
+  .rrb-btn.danger:hover { background: var(--bad-bg); border-color: var(--bad); }
 
   .rrb-teamlist { margin-top: 14px; max-height: 240px; overflow-y: auto; }
   .rrb-team-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; font-size: 13px; }
@@ -142,8 +144,9 @@
         <textarea id="rrb-paste" placeholder="Aurora, 2150&#10;Nimbus, 1980&#10;Vortex, 1820"></textarea>
         <div class="rrb-paste-actions">
           <button class="rrb-btn sm" id="rrb-paste-btn">Import list</button>
+          <label class="rrb-btn sm ghost" style="display:inline-flex;align-items:center;">Upload file<input type="file" id="rrb-upload" accept=".txt" style="display:none"></label>
           <button class="rrb-btn sm ghost" id="rrb-sample">Load sample</button>
-          <button class="rrb-btn sm ghost" id="rrb-clear">Clear all</button>
+          <button class="rrb-btn sm danger" id="rrb-clear" style="margin-top:2px;width:100%;">Clear all</button>
         </div>
         <div class="rrb-teamlist" id="rrb-teamlist"></div>
       </div>
@@ -165,7 +168,6 @@
   </div>
 
   <div class="rrb-note">
-    <b style="color:var(--text);font-weight:600">On FACEIT Elo:</b> Elo is a per-player rating, so a team's strength is the average of its roster's Elo \u2014 read it off the team page or a finder tool and enter it here. Pulling it automatically from a team link isn't possible in a self-contained page, since FACEIT's data API needs a private key and blocks browser requests.<br><br>
     <b style="color:var(--text);font-weight:600">Reading the metrics:</b> <code>Group avg spread</code> measures balance <em>across</em> groups (lower = groups are evenly matched). <code>Range</code> and <code>SD</code> inside a group measure balance <em>within</em> it. Per-matchup gaps show the Elo difference each round-robin game would have \u2014 a high max gap means at least one lopsided match even if the group average looks fair. Snake draft equalizes group averages first; it does not minimize internal gaps.
   </div>
 </div>
@@ -394,6 +396,28 @@
       }
     });
     if (added) { document.getElementById('rrb-paste').value = ''; render(); }
+  });
+
+  document.getElementById('rrb-upload').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var lines = ev.target.result.split(/\r?\n/);
+      var added = 0;
+      lines.forEach(function (line) {
+        if (!line.trim()) return;
+        var parts = line.split(/[,;\t]/);
+        if (parts.length >= 2) {
+          var name = parts[0];
+          var elo = parts[parts.length - 1].replace(/[^0-9]/g, '');
+          if (addTeam(name, elo)) added++;
+        }
+      });
+      if (added) render();
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   });
 
   document.getElementById('rrb-sample').addEventListener('click', function () {
