@@ -113,6 +113,12 @@
   .rrb-empty { color: var(--text-dim); font-size: 14px; padding: 40px 20px; text-align: center; }
   .rrb-note { font-size: 12px; color: var(--text-dim); margin-top: 16px; line-height: 1.6; }
   .rrb-note code { font-family: var(--mono); background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+  .rrb-info { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--text-dim); background: var(--panel-2); border: 1px solid var(--line); cursor: help; flex-shrink: 0; outline: none; vertical-align: middle; margin-left: 5px; line-height: 1; user-select: none; }
+  .rrb-info:hover, .rrb-info:focus { color: var(--text); border-color: var(--accent-line); }
+  .rrb-tooltip { position: absolute; top: calc(100% + 8px); left: 0; width: 250px; background: #0b0d11; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; font-family: var(--font); font-size: 12px; font-weight: 400; color: var(--text-dim); line-height: 1.55; z-index: 20; opacity: 0; visibility: hidden; transform: translateY(-3px); transition: opacity .15s, transform .15s, visibility .15s; box-shadow: 0 8px 28px rgba(0,0,0,0.5); text-align: left; white-space: normal; pointer-events: none; }
+  .rrb-info:hover .rrb-tooltip, .rrb-info:focus .rrb-tooltip { opacity: 1; visibility: visible; transform: translateY(0); }
+  .rrb-tooltip::before { content: ""; position: absolute; bottom: 100%; left: 8px; border: 6px solid transparent; border-bottom-color: var(--line); }
+  .rrb-tooltip b { color: var(--accent); font-weight: 600; display: block; margin-bottom: 4px; }
   .calc-nav { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .calc-nav-btn { font-size: 12px; color: var(--text-dim); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; text-decoration: none; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
   .calc-nav-btn:hover { color: #5b8cff; border-color: rgba(91,140,255,0.55); }
@@ -263,9 +269,9 @@
     var summary = '<div class="rrb-summary"><div class="rrb-summary-grid">' +
       metric('Groups', groupCount) +
       metric('Teams / group', describeSizes(groups)) +
-      metric('Group avg spread', gSpread + ' <small>Elo SD</small>') +
-      metric('Highest vs lowest', avgRange + ' <small>Elo</small>') +
-      metric('Biggest matchup gap', globalMaxGap + ' <small>Elo</small>') +
+      metric('Group avg spread', gSpread + ' <small>Elo SD</small>', '<b>SD across groups</b>Standard deviation of the group averages. SD measures how far each group’s mean Elo deviates from the overall mean — a low SD means all groups sit close to the same average.') +
+      metric('Highest vs lowest', avgRange + ' <small>Elo</small>', '<b>Range across groups</b>Difference between the strongest and weakest group average. Range = highest avg − lowest avg. Unlike SD it only looks at the two extremes, so one outlier group inflates this even if the rest are balanced.') +
+      metric('Biggest matchup gap', globalMaxGap + ' <small>Elo</small>', '<b>Max per-game gap</b>The largest Elo difference between any two opponents in the same group. A high number means at least one match is heavily one-sided, even if the group’s average looks fair.') +
       '</div><div class="rrb-balance-badge ' + vClass + '">' + balanceIcon(vClass) + verdict + ' across groups</div></div>';
 
     var groupsHtml = '<div class="rrb-groups">';
@@ -310,7 +316,10 @@
     return mn === mx ? String(mn) : mn + '\u2013' + mx;
   }
 
-  function metric(k, v) { return '<div class="rrb-metric"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
+  function metric(k, v, tip) {
+    var info = tip ? ' <span class="rrb-info" tabindex="0">i<span class="rrb-tooltip">' + tip + '</span></span>' : '';
+    return '<div class="rrb-metric"><div class="k">' + k + info + '</div><div class="v">' + v + '</div></div>';
+  }
   function balanceIcon(c) {
     if (c === 'good') return '<span style="font-size:14px">\u2713</span>';
     if (c === 'warn') return '<span style="font-size:14px">\u25CB</span>';
