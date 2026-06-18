@@ -50,13 +50,10 @@
   .deb-quick { display: flex; flex-wrap: wrap; gap: 7px; }
   .deb-quick button { background: var(--panel-2); border: 1px solid var(--line); color: var(--text-dim); font: inherit; font-size: 12px; padding: 4px 11px; border-radius: 6px; cursor: pointer; }
   .deb-quick button:hover { border-color: var(--wb-line); color: var(--text); }
-  .deb-toggle-wrap { display: flex; align-items: center; gap: 8px; margin-left: 28px; }
-  .deb-toggle { display: inline-flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-dim); cursor: pointer; user-select: none; white-space: nowrap; }
-  .deb-toggle-label { white-space: nowrap; }
-  .deb-track { position: relative; width: 34px; height: 19px; background: var(--line); border-radius: 10px; transition: background .2s; flex-shrink: 0; }
-  .deb-track.on { background: #1D9E75; }
-  .deb-knob { position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; background: #fff; border-radius: 50%; transition: transform .2s; }
-  .deb-track.on .deb-knob { transform: translateX(15px); }
+  .deb-toggle-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin-left: 28px; }
+  .deb-checkbox-row { display: flex; align-items: center; gap: 8px; }
+  .deb-toggle-label { font-size: 13px; color: var(--text-dim); white-space: nowrap; cursor: pointer; }
+  #deb-reset-cb { width: 15px; height: 15px; accent-color: var(--wb); cursor: pointer; }
 
   .deb-info {
     position: relative; display: inline-flex; align-items: center; justify-content: center;
@@ -171,19 +168,19 @@
     <div class="deb-row">
       <div class="deb-quick" id="deb-quick"></div>
       <div class="deb-toggle-wrap">
-        <label class="deb-toggle" id="deb-reset-toggle">
-          <span class="deb-track on" id="deb-track"><span class="deb-knob"></span></span>
-          <span class="deb-toggle-label">Grand final reset</span>
-        </label>
-        <span class="deb-info" tabindex="0" aria-label="What is a grand final reset?">
-          i
-          <span class="deb-tooltip" role="tooltip">
-            <b>Grand final reset (double final)</b>
-            The winners-bracket champion reaches the grand final with zero losses; the losers-bracket champion arrives with one. For a fair finish, the LB team must beat the WB team <em>twice</em>.
-            <span class="deb-tip-ex">Example: WB champ "Team A" meets LB champ "Team B". If B wins game 1, both now have one loss, so a second deciding game is played. If A wins game 1, A is champion immediately \u2014 B already had its one loss.</span>
-            <span class="deb-tip-off">Turn this off for a single grand final: one game decides it, and the LB champion gets no second chance.</span>
+        <div class="deb-checkbox-row">
+          <input type="checkbox" id="deb-reset-cb" checked>
+          <span class="deb-info" tabindex="0" aria-label="What is a grand final reset?">
+            i
+            <span class="deb-tooltip" role="tooltip">
+              <b>Grand final reset (double final)</b>
+              The winners-bracket champion reaches the grand final with zero losses; the losers-bracket champion arrives with one. For a fair finish, the LB team must beat the WB team <em>twice</em>.
+              <span class="deb-tip-ex">Example: WB champ "Team A" meets LB champ "Team B". If B wins game 1, both now have one loss, so a second deciding game is played. If A wins game 1, A is champion immediately \u2014 B already had its one loss.</span>
+              <span class="deb-tip-off">Turn this off for a single grand final: one game decides it, and the LB champion gets no second chance.</span>
+            </span>
           </span>
-        </span>
+        </div>
+        <label for="deb-reset-cb" class="deb-toggle-label">Grand final reset</label>
       </div>
     </div>
   </div>
@@ -394,9 +391,8 @@
   function update() { out.textContent = slider.value; render(+slider.value, resetOn); }
   slider.addEventListener('input', update);
 
-  document.getElementById('deb-reset-toggle').addEventListener('click', function () {
-    resetOn = !resetOn;
-    document.getElementById('deb-track').classList.toggle('on', resetOn);
+  document.getElementById('deb-reset-cb').addEventListener('change', function () {
+    resetOn = this.checked;
     update();
   });
 
