@@ -86,6 +86,7 @@
   .rrb-balance-badge.good { background: var(--good-bg); color: var(--good); }
   .rrb-balance-badge.warn { background: var(--warn-bg); color: var(--warn); }
   .rrb-balance-badge.bad { background: var(--bad-bg); color: var(--bad); }
+  .rrb-balance-badge.neutral { background: var(--panel-2); color: var(--text-dim); }
 
   .rrb-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
   .rrb-group { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); overflow: hidden; }
@@ -188,6 +189,7 @@
   var groups = [];
   var groupCount = 4;
   var mode = 'input';
+  var dirty = false;
 
   function letter(i) { return String.fromCharCode(65 + i); }
   function round(x) { return Math.round(x); }
@@ -249,6 +251,7 @@
   }
 
   function applyMode() {
+    dirty = false;
     if (mode === 'tier') tierSort();
     else if (mode === 'input') inputOrder();
     else snakeDraft();
@@ -297,14 +300,20 @@
     groups.forEach(function (g) { pairGaps(g).forEach(function (p) { allGaps.push(p.gap); }); });
     var globalMaxGap = allGaps.length ? Math.max.apply(null, allGaps) : 1;
 
-    // balance verdict based on group-avg range relative to overall elo spread
-    var allElo = teams.map(function (t) { return t.elo; });
-    var eloSpread = Math.max.apply(null, allElo) - Math.min.apply(null, allElo);
-    var ratio = eloSpread ? avgRange / eloSpread : 0;
-    var verdict, vClass;
-    if (avgRange <= 50 || ratio < 0.06) { verdict = 'Well balanced'; vClass = 'good'; }
-    else if (avgRange <= 150 || ratio < 0.15) { verdict = 'Reasonably balanced'; vClass = 'warn'; }
-    else { verdict = 'Uneven groups'; vClass = 'bad'; }
+    var badgeHtml;
+    if (dirty) {
+      var allElo = teams.map(function (t) { return t.elo; });
+      var eloSpread = Math.max.apply(null, allElo) - Math.min.apply(null, allElo);
+      var ratio = eloSpread ? avgRange / eloSpread : 0;
+      var verdict, vClass;
+      if (avgRange <= 50 || ratio < 0.06) { verdict = 'Well balanced'; vClass = 'good'; }
+      else if (avgRange <= 150 || ratio < 0.15) { verdict = 'Reasonably balanced'; vClass = 'warn'; }
+      else { verdict = 'Uneven groups'; vClass = 'bad'; }
+      badgeHtml = '<div class="rrb-balance-badge ' + vClass + '">' + balanceIcon(vClass) + verdict + ' — manually adjusted</div>';
+    } else {
+      var modeLabel = { input: 'Original input', snake: 'Auto-balanced', tier: 'Skill tiers' }[mode];
+      badgeHtml = '<div class="rrb-balance-badge neutral">' + modeLabel + '</div>';
+    }
 
     var summary = '<div class="rrb-summary"><div class="rrb-summary-grid">' +
       metric('Groups', groupCount) +
@@ -312,7 +321,7 @@
       metric('Group avg spread', gSpread + ' <small>Elo SD</small>', '<b>SD across groups</b>Standard deviation of the group averages. SD measures how far each group’s mean Elo deviates from the overall mean — a low SD means all groups sit close to the same average.') +
       metric('Highest vs lowest', avgRange + ' <small>Elo</small>', '<b>Range across groups</b>Difference between the strongest and weakest group average. Range = highest avg − lowest avg. Unlike SD it only looks at the two extremes, so one outlier group inflates this even if the rest are balanced.') +
       metric('Biggest matchup gap', globalMaxGap + ' <small>Elo</small>', '<b>Max per-game gap</b>The largest Elo difference between any two opponents in the same group. A high number means at least one match is heavily one-sided, even if the group’s average looks fair.') +
-      '</div><div class="rrb-balance-badge ' + vClass + '">' + balanceIcon(vClass) + verdict + ' across groups</div></div>';
+      '</div>' + badgeHtml + '</div>';
 
     var groupsHtml = '<div class="rrb-groups">';
     groups.forEach(function (g, gi) {
@@ -386,6 +395,7 @@
         if (idx === -1) return;
         var moved = groups[from].splice(idx, 1)[0];
         groups[+to].push(moved);
+        dirty = true;
         render();
       });
     });
