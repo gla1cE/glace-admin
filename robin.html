@@ -164,7 +164,8 @@
           <label class="rrb-label">Number of groups</label>
           <input type="number" id="rrb-groups-n" value="4" min="2" max="16" step="1">
         </div>
-        <button class="rrb-btn" id="rrb-balance">Auto-balance (snake draft)</button>
+        <button class="rrb-btn" id="rrb-balance">Auto-balance</button>
+        <button class="rrb-btn ghost" id="rrb-tier">Skill tiers</button>
         <div class="rrb-spacer"></div>
         <span id="rrb-team-count" style="font-size:13px;color:var(--text-dim)"></span>
       </div>
@@ -183,6 +184,7 @@
   var teams = [];
   var groups = [];
   var groupCount = 4;
+  var mode = 'snake';
 
   function letter(i) { return String.fromCharCode(65 + i); }
   function round(x) { return Math.round(x); }
@@ -221,9 +223,24 @@
     groups = gs;
   }
 
+  function tierSort() {
+    var sorted = teams.slice().sort(function (a, b) { return b.elo - a.elo; });
+    var G = groupCount;
+    var gs = [];
+    for (var i = 0; i < G; i++) gs.push([]);
+    var base = Math.floor(sorted.length / G);
+    var rem = sorted.length % G;
+    var cursor = 0;
+    for (var gi = 0; gi < G; gi++) {
+      var size = base + (gi < rem ? 1 : 0);
+      for (var k = 0; k < size; k++) gs[gi].push(sorted[cursor++]);
+    }
+    groups = gs;
+  }
+
   function ensureGroups() {
     if (!groups.length || groups.reduce(function (a, g) { return a + g.length; }, 0) !== teams.length) {
-      snakeDraft();
+      if (mode === 'tier') tierSort(); else snakeDraft();
     }
   }
 
@@ -445,7 +462,19 @@
   });
 
   document.getElementById('rrb-balance').addEventListener('click', function () {
-    if (teams.length >= groupCount) { snakeDraft(); render(); }
+    if (teams.length < groupCount) return;
+    mode = 'snake';
+    document.getElementById('rrb-balance').className = 'rrb-btn';
+    document.getElementById('rrb-tier').className = 'rrb-btn ghost';
+    snakeDraft(); render();
+  });
+
+  document.getElementById('rrb-tier').addEventListener('click', function () {
+    if (teams.length < groupCount) return;
+    mode = 'tier';
+    document.getElementById('rrb-balance').className = 'rrb-btn ghost';
+    document.getElementById('rrb-tier').className = 'rrb-btn';
+    tierSort(); render();
   });
 
   render();
