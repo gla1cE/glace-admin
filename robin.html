@@ -56,6 +56,7 @@
   .rrb-btn.sm { padding: 4px 10px; font-size: 12px; }
   .rrb-btn.ghost { background: var(--panel-2); border-color: var(--line); color: var(--text-dim); }
   .rrb-btn.ghost:hover { color: var(--text); border-color: var(--accent-line); }
+  .rrb-btn.ghost.sel { background: var(--accent-bg); color: #7fe0c0; border-color: var(--accent-line); }
 
   .rrb-divider { height: 1px; background: var(--line-soft); margin: 16px 0; }
   .rrb-paste-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
@@ -164,8 +165,10 @@
           <label class="rrb-label">Number of groups</label>
           <input type="number" id="rrb-groups-n" value="4" min="2" max="16" step="1">
         </div>
-        <button class="rrb-btn" id="rrb-balance">Auto-balance</button>
+        <button class="rrb-btn ghost sel" id="rrb-input">Original input</button>
+        <button class="rrb-btn ghost" id="rrb-balance">Auto-balance</button>
         <button class="rrb-btn ghost" id="rrb-tier">Skill tiers</button>
+        <button class="rrb-btn" id="rrb-sort-now">Sort now!</button>
         <div class="rrb-spacer"></div>
         <span id="rrb-team-count" style="font-size:13px;color:var(--text-dim)"></span>
       </div>
@@ -175,7 +178,7 @@
   </div>
 
   <div class="rrb-note">
-    <b style="color:var(--text);font-weight:600">Reading the metrics:</b> <code>Group avg spread</code> measures balance <em>across</em> groups (lower = groups are evenly matched). <code>Range</code> and <code>SD</code> inside a group measure balance <em>within</em> it. Per-matchup gaps show the Elo difference each round-robin game would have \u2014 a high max gap means at least one lopsided match even if the group average looks fair. Snake draft equalizes group averages first; it does not minimize internal gaps.
+    <b style="color:var(--text);font-weight:600">Reading the metrics:</b> <code>Group avg spread</code> measures balance <em>across</em> groups (lower = groups are evenly matched). <code>Range</code> and <code>SD</code> inside a group measure balance <em>within</em> it. Per-matchup gaps show the Elo difference each round-robin game would have \u2014 a high max gap means at least one lopsided match even if the group average looks fair. Select a sort mode then confirm with <em>Sort now!</em> — <b>Original input</b> preserves entry order; <b>Auto-balance</b> (snake draft) equalizes group averages; <b>Skill tiers</b> puts similarly-rated teams together in the same group.
   </div>
 </div>
 
@@ -184,7 +187,7 @@
   var teams = [];
   var groups = [];
   var groupCount = 4;
-  var mode = 'snake';
+  var mode = 'input';
 
   function letter(i) { return String.fromCharCode(65 + i); }
   function round(x) { return Math.round(x); }
@@ -223,8 +226,7 @@
     groups = gs;
   }
 
-  function tierSort() {
-    var sorted = teams.slice().sort(function (a, b) { return b.elo - a.elo; });
+  function consecutiveFill(sorted) {
     var G = groupCount;
     var gs = [];
     for (var i = 0; i < G; i++) gs.push([]);
@@ -238,9 +240,30 @@
     groups = gs;
   }
 
+  function tierSort() {
+    consecutiveFill(teams.slice().sort(function (a, b) { return b.elo - a.elo; }));
+  }
+
+  function inputOrder() {
+    consecutiveFill(teams.slice().sort(function (a, b) { return a.id - b.id; }));
+  }
+
+  function applyMode() {
+    if (mode === 'tier') tierSort();
+    else if (mode === 'input') inputOrder();
+    else snakeDraft();
+  }
+
+  function setModeBtn(m) {
+    mode = m;
+    document.getElementById('rrb-input').className = 'rrb-btn ghost' + (m === 'input' ? ' sel' : '');
+    document.getElementById('rrb-balance').className = 'rrb-btn ghost' + (m === 'snake' ? ' sel' : '');
+    document.getElementById('rrb-tier').className = 'rrb-btn ghost' + (m === 'tier' ? ' sel' : '');
+  }
+
   function ensureGroups() {
     if (!groups.length || groups.reduce(function (a, g) { return a + g.length; }, 0) !== teams.length) {
-      if (mode === 'tier') tierSort(); else snakeDraft();
+      applyMode();
     }
   }
 
@@ -461,20 +484,12 @@
     if (!isNaN(v) && v >= 2 && v <= 16) { groupCount = v; groups = []; render(); }
   });
 
-  document.getElementById('rrb-balance').addEventListener('click', function () {
-    if (teams.length < groupCount) return;
-    mode = 'snake';
-    document.getElementById('rrb-balance').className = 'rrb-btn';
-    document.getElementById('rrb-tier').className = 'rrb-btn ghost';
-    snakeDraft(); render();
-  });
+  document.getElementById('rrb-input').addEventListener('click', function () { setModeBtn('input'); });
+  document.getElementById('rrb-balance').addEventListener('click', function () { setModeBtn('snake'); });
+  document.getElementById('rrb-tier').addEventListener('click', function () { setModeBtn('tier'); });
 
-  document.getElementById('rrb-tier').addEventListener('click', function () {
-    if (teams.length < groupCount) return;
-    mode = 'tier';
-    document.getElementById('rrb-balance').className = 'rrb-btn ghost';
-    document.getElementById('rrb-tier').className = 'rrb-btn';
-    tierSort(); render();
+  document.getElementById('rrb-sort-now').addEventListener('click', function () {
+    if (teams.length >= groupCount) { applyMode(); render(); }
   });
 
   render();
