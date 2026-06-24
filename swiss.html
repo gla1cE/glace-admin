@@ -195,7 +195,15 @@
     font-size: 11px; padding: 1px 7px; border-radius: 6px;
   }
   .stb-tag .q { color: #8fe3b6; background: var(--success-bg); }
+  .stb-tag .b { color: #f1d28a; background: var(--warn-bg); }
   .stb-tag .o { color: var(--text-dim); background: var(--panel-2); }
+
+  .stb-mode-row { display: flex; margin-bottom: 20px; }
+  .stb-mode-btn { flex: 1; background: var(--panel-2); border: 1px solid var(--line); color: var(--text-dim); font: inherit; font-size: 13px; padding: 8px 14px; cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+  .stb-mode-btn:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); border-right: none; }
+  .stb-mode-btn:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .stb-mode-btn.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-line); }
+  .stb-mode-btn.active + .stb-mode-btn { border-left-color: var(--accent-line); }
 
   @media (max-width: 520px) {
     .stb-grid.two { grid-template-columns: 1fr; }
@@ -229,7 +237,12 @@
     </div>
   </div>
 
-  <div class="stb-grid two">
+  <div class="stb-mode-row">
+    <button class="stb-mode-btn active" id="stb-mode-elim">Qualify / Eliminate</button>
+    <button class="stb-mode-btn" id="stb-mode-fixed">Fixed rounds</button>
+  </div>
+
+  <div class="stb-grid two" id="stb-elim-controls">
     <div>
       <label for="stb-wincut">Qualify at: <b id="stb-wc-out">3</b> wins</label>
       <input type="range" id="stb-wincut" min="1" max="6" value="3" step="1">
@@ -237,6 +250,13 @@
     <div>
       <label for="stb-losscut">Eliminate at: <b id="stb-lc-out">3</b> losses</label>
       <input type="range" id="stb-losscut" min="1" max="6" value="3" step="1">
+    </div>
+  </div>
+
+  <div class="stb-grid" id="stb-fixed-controls" style="display:none">
+    <div>
+      <label for="stb-rounds">Rounds played: <b id="stb-rounds-out">5</b></label>
+      <input type="range" id="stb-rounds" min="1" max="12" value="5" step="1">
     </div>
   </div>
 
@@ -329,7 +349,92 @@
     });
   }
 
+  var simMode = 'elim';
+
+  function swissSimFixed(teams, rounds) {
+    var groups = { '0-0': teams };
+    for (var r = 0; r < rounds; r++) {
+      var nxt = {};
+      for (var key in groups) {
+        var p = key.split('-'); var w = +p[0], l = +p[1]; var c = groups[key];
+        if (c <= 0) continue;
+        var win = Math.floor(c / 2), lose = c - win;
+        var wk = (w + 1) + '-' + l, lk = w + '-' + (l + 1);
+        nxt[wk] = (nxt[wk] || 0) + win;
+        nxt[lk] = (nxt[lk] || 0) + lose;
+      }
+      groups = nxt;
+    }
+    return groups;
+  }
+
+  function renderStandingsFixed(recs, paid) {
+    var sorted = Object.keys(recs).map(function (r) {
+      var p = r.split('-'); return { rec: r, w: +p[0], l: +p[1], n: recs[r] };
+    }).sort(function (a, b) { return b.w !== a.w ? b.w - a.w : a.l - b.l; });
+    var cum = 0;
+    sorted.forEach(function (row) { row.before = cum; cum += row.n; row.after = cum; });
+    var max = 0; sorted.forEach(function (r) { if (r.n > max) max = r.n; });
+    var el = document.getElementById('stb-standings'); el.innerHTML = '';
+    sorted.forEach(function (r) {
+      var pct = max ? Math.round(r.n / max * 100) : 0;
+      var isPaid = r.after <= paid, isBubble = r.before < paid && r.after > paid;
+      var col = isPaid ? 'var(--success)' : isBubble ? 'var(--warn)' : 'var(--text-dim)';
+      var tag = isPaid ? '<span class="q">paid</span>' : isBubble ? '<span class="b">bubble</span>' : '<span class="o">out</span>';
+      el.innerHTML += '<div class="stb-stand-row">'
+        + '<span class="rec">' + r.rec + '</span>'
+        + '<div class="stb-bar-track"><div class="stb-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>'
+        + '<span class="cnt">' + r.n + '</span>'
+        + '<span class="stb-tag">' + tag + '</span></div>';
+    });
+  }
+
+  function computeFixed() {
+    var teams = Math.max(2, Math.round(+document.getElementById('stb-teams').value || 0));
+    var paid = Math.max(1, Math.round(+document.getElementById('stb-paid').value || 0));
+    var rounds = +document.getElementById('stb-rounds').value;
+    document.getElementById('stb-rounds-out').textContent = rounds;
+    if (paid > teams) { paid = teams; document.getElementById('stb-paid').value = paid; }
+
+    var warn = document.getElementById('stb-warn');
+    var summary = document.getElementById('stb-summary');
+    var stages = document.getElementById('stb-stages');
+    warn.style.display = 'none';
+
+    var recs = swissSimFixed(teams, rounds);
+    renderStandingsFixed(recs, paid);
+
+    var sorted = Object.keys(recs).map(function (r) {
+      var p = r.split('-'); return { rec: r, w: +p[0], l: +p[1], n: recs[r] };
+    }).sort(function (a, b) { return b.w !== a.w ? b.w - a.w : a.l - b.l; });
+    var cum = 0, bubbleRec = null, paidClean = false;
+    sorted.forEach(function (row) {
+      var before = cum; cum += row.n;
+      if (cum === paid) paidClean = true;
+      if (before < paid && cum > paid) bubbleRec = row.rec;
+    });
+
+    var totalMatches = Math.floor(teams / 2) * rounds;
+    stages.innerHTML = stageCard('1', 'Swiss stage', [
+      ['Format', 'all ' + teams + ' teams, ' + rounds + ' rounds, no cutoffs'],
+      ['Total matches', '~' + totalMatches],
+      ['Final standings', 'ranked by W-L record']
+    ], true);
+
+    if (paidClean) {
+      summary.style.background = 'var(--success-bg)'; summary.style.color = '#8fe3b6';
+      summary.innerHTML = '<span class="ico">✓</span>Paid places (' + paid + ') falls on a clean record boundary — no tiebreaker needed.';
+    } else if (bubbleRec) {
+      summary.style.background = 'var(--warn-bg)'; summary.style.color = '#f1d28a';
+      summary.innerHTML = '<span class="ico">!</span>Paid cut falls mid-record at <b>' + bubbleRec + '</b> — teams at this record need a tiebreaker to separate paid from unpaid.';
+    } else {
+      summary.style.background = 'var(--accent-bg)'; summary.style.color = '#aec1ff';
+      summary.innerHTML = '<span class="ico">≡</span>' + teams + ' teams play ' + rounds + ' rounds. Rank by record.';
+    }
+  }
+
   function compute() {
+    if (simMode === 'fixed') { computeFixed(); return; }
     var teams = Math.max(2, Math.round(+document.getElementById('stb-teams').value || 0));
     var paid = Math.max(1, Math.round(+document.getElementById('stb-paid').value || 0));
     var winCut = +document.getElementById('stb-wincut').value;
@@ -415,9 +520,27 @@
     stages.innerHTML = '';
   }
 
-  ['stb-teams', 'stb-paid', 'stb-wincut', 'stb-losscut'].forEach(function (id) {
+  ['stb-teams', 'stb-paid', 'stb-wincut', 'stb-losscut', 'stb-rounds'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', compute);
   });
+
+  document.getElementById('stb-mode-elim').addEventListener('click', function () {
+    simMode = 'elim';
+    document.getElementById('stb-mode-elim').classList.add('active');
+    document.getElementById('stb-mode-fixed').classList.remove('active');
+    document.getElementById('stb-elim-controls').style.display = '';
+    document.getElementById('stb-fixed-controls').style.display = 'none';
+    compute();
+  });
+  document.getElementById('stb-mode-fixed').addEventListener('click', function () {
+    simMode = 'fixed';
+    document.getElementById('stb-mode-fixed').classList.add('active');
+    document.getElementById('stb-mode-elim').classList.remove('active');
+    document.getElementById('stb-elim-controls').style.display = 'none';
+    document.getElementById('stb-fixed-controls').style.display = '';
+    compute();
+  });
+
   compute();
 })();
 </script>
